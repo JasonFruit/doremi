@@ -4,8 +4,8 @@ works.
 
 """
 
-# TODO: implement repeats, rests, ties, and shape notes; figure out
-# how to make fermatas in bass staves upside-down in the template,
+# TODO: implement repeats, ties, and shape notes; figure out how to
+# make fermatas in bass staves upside-down in the template,
 
 from __future__ import print_function
 import codecs
@@ -32,6 +32,10 @@ degree, duration, octave, and other information"""
         Convert to an equivalent Lilypond representation
         """
         #TODO: consider moving to lilypond.py
+
+        # short-circuit if this is a rest
+        if self.pitch == "r":
+            return "%s%s" % (self.pitch, self.duration)
         
         pitch = syllable_to_note(self.pitch, key)
         octave = self.octave + octave_offset
