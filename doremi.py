@@ -4,8 +4,8 @@ works.
 
 """
 
-# TODO: implement repeats, ties, and shape notes; figure out how to
-# make fermatas in bass staves upside-down in the template,
+# TODO: implement repeats and shape notes; figure out how to make
+# fermatas in bass staves upside-down in the template,
 
 from __future__ import print_function
 import codecs
@@ -61,6 +61,12 @@ degree, duration, octave, and other information"""
         elif "end slur" in self.modifiers:
             slur = ")"
 
+        # ties only ever connect two notes, so need not be explicitly
+        # terminated
+        tie = ""
+        if "tie" in self.modifiers:
+            tie = "~"
+
         # add a fermata
         if "fermata" in self.modifiers:
             fermata = r"\fermata"
@@ -68,7 +74,12 @@ degree, duration, octave, and other information"""
             fermata = ""
 
         # assemble and return the Lilypond string
-        return "%s%s%s%s%s" % (pitch, octave, self.duration, slur, fermata)
+        return "%s%s%s%s%s%s" % (pitch,
+                                 octave,
+                                 self.duration,
+                                 tie,
+                                 slur,
+                                 fermata)
             
 class Voice(list):
     """Represents a named part in a vocal-style composition"""
