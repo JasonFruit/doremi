@@ -1,0 +1,29 @@
+title: "Adieu"
+composer: ""
+key: aes major
+time: 6/4
+partial: 4
+voices: [{name: soprano
+	  octave: 0
+	  content: [4 sol + 2 do 4 do slur do re mi 2 do 4 do - slur la sol
+	  	    4 sol + 2 do 4 do slur do re mi 2 sol 4 mi 2 sol
+		    4 fermata sol slur la sol mi slur sol mi do 2 sol 4 mi slur re do
+		    - 4 la + 2 do 4 do - slur la sol la + slur do mi re 2 do]}
+         {name: alto
+	  octave: 0
+	  content: [4 mi 2 mi 4 mi slur mi fa sol 2 mi 4 mi slur fa mi
+	  	    4 mi 2 mi 4 mi 2 sol 4 sol 2 sol 4 sol 2 sol
+		    + 4 do 2 do 4 do 2 do - 4 sol + 2 do 4 do - 2 la
+		    4 fa 2 sol 4 sol 2 fa 4 fa 2 sol 4 fa 2 mi]}
+         {name: tenor
+	  octave: 0
+	  content: [4 do - 2 sol 4 sol 2 sol + 4 do - 2 sol 4 sol + 2 do
+	  	    4 do - 2 sol 4 sol + slur do - ti + do 2 mi 4 do 2 mi
+		    4 mi slur fa mi sol slur mi sol mi 2 mi 4 sol 2 fa
+		    4 do 2 do 4 do 2 do 4 do 2 do - 4 ti + 2 do]}
+         {name: bass
+	  octave: -1
+	  content: [4 do 2 do 4 do 2 do 4 do 2 do 4 do 2 do
+	  	    4 do 2 do 4 do slur mi sol + do 2 do 4 do 2 do
+		    4 do 2 do 4 do 2 do 4 do 2 do 4 do - 2 fa
+		    4 fa 2 mi 4 mi 2 fa 4 fa slur mi sol sol 2 do]}]

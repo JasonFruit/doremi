@@ -1,0 +1,23 @@
+tune = (ws (title / composer / key / time / partial / voices) ws)+
+title = "title" ws ":" ws string
+composer = "composer" ws ":" ws string
+key = "key" ws ":" ws name ws name
+time = "time" ws ":" ws fraction
+partial = "partial" ws ":" ws number
+voices = "voices" ws ":" ws voice_array
+
+voice_array = "[" (ws voice ws)+ "]"
+voice = "{" ((ws voice_name ws) / (ws octave ws) / (ws content ws))+ "}"
+voice_name = "name" ws ":" ws name
+octave = "octave" ws ":" ws number
+content = "content" ws ":" ws "[" ws ( (time ws) / (note_modifier ws) / (note ws) / (number ws) )+ ws "]"
+note = "do" / "di" / "ra" / "re" / "ri" / "me" / "mi" / "fa" / "fi" / "se" / "sol" / "si" / "le" / "la" / "li" / "te" / "ti" / "r"
+note_modifier = "fermata" / "slur" / "tie" / "-" / "+"
+name = ~r"[A-Za-z]" ~r"[A-Za-z0-9\-]*"
+string = "\"" text "\""
+text = ~'[^"]*'
+fraction = number "/" number
+number = ~"-{0,1}[0-9]+"
+ws = (nl / s)*
+nl = ("\n" / "\r\n")
+s = ~"\s"

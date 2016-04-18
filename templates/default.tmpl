@@ -1,0 +1,57 @@
+\version "2.14.2"
+
+%(voices)s
+
+\paper  {
+  print-page-number = ##f
+}
+
+\header {
+  poet = "%(author)s"
+  instrument = \markup { \smallCaps "%(title)s" }
+  composer = \markup { \smallCaps { "%(composer)s" }}
+  tagline = ""
+}
+
+\score
+{
+  <<
+    \new StaffGroup {
+      <<
+	\new Staff = "treble" {
+	  <<
+	    \clef treble
+	    \new Voice = "one" {
+	      \stemUp \slurUp \tieUp %(partial)s  \exportedvoice_soprano_music
+	    }
+	    \new Voice = "two" { \stemDown \slurDown \tieDown  \exportedvoice_alto_music }
+	  >>
+	}
+	\new Staff = "bass" {
+	  \clef bass
+	  <<
+	    
+	    \new Voice = "three" { \stemUp \slurUp \tieUp  \exportedvoice_tenor_music }
+	    \new  Voice = "four" { \stemDown \slurDown \tieDown \exportedvoice_bass_music }
+	  >>
+	}
+      >>
+    }
+    
+  >>
+
+  \layout {
+    \context {
+    }
+    \context {
+      \Lyrics
+      \override LyricText #'font-size = #-1
+    }
+    \context {
+      \Score
+      \remove "Bar_number_engraver"
+    }
+    indent = 0 \cm
+  }
+  \midi { }
+}
