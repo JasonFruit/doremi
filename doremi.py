@@ -1,11 +1,10 @@
-"""An initial version of a simple music-representation language
-suitable for hymn tunes, part-songs, and other brief, likely vocal
-works.
+"""A simple music-representation language suitable for hymn tunes,
+part-songs, and other brief, likely vocal works.
 
 """
 
-# TODO: implement repeats and shape notes; figure out how to make
-# fermatas in bass staves upside-down in the template,
+# TODO: implement repeats; figure out how to make fermatas in bass
+# staves upside-down in the template
 
 from __future__ import print_function
 import codecs
@@ -89,20 +88,40 @@ class Voice(list):
         list.__init__(self)
         self.name = name
         self.octave = octave # the starting octave for the part
-    def to_lilypond(self, time, key, octave_offset=0):
+    def to_lilypond(self,
+                    time,
+                    key,
+                    octave_offset=0,
+                    shapes=None):
         """A representation of the voice as a Lilypond string"""
+
+        # association of doremi shape args and Lilypond shape commands
+        shape_dic = {"round": ("", ""),
+                     "aikin": (r"\aikenHeads", "Minor"),
+                     "sacredharp": (r"\sacredHarpHeads", "Minor"),
+                     "southernharmony": (r"\southernHarmonyHeads", "Minor"),
+                     "funk": (r"\funkHeads", "Minor"),
+                     "walker": (r"\walkerHeads", "Minor")}
+
+        # build the lilypond shape command
+        if shapes == None:
+            lshapes = ""
+        else:
+            lparts = shape_dic[shapes.lower()]
+            lshapes = lparts[0]
+
+            # there's a different command for minor
+            if "minor" in key:
+                lshapes += lparts[1]
+
+        tmpl = codecs.open("templates/default-voice.tmpl",
+                           "r",
+                           "utf-8").read()
         
-        tmpl = r"""exportedvoice_%(name)s_music = {
-  \key %(key)s
-  \autoBeamOff
-  \time %(time)s
-    {
-        %(notes)s \bar "|."
-  }
-}"""
         return tmpl % {"name": self.name,
                        "key": key.replace(" ", " \\"), # a minor -> a \minor
                        "time": time,
+                       "shapes": lshapes,
                        "notes": " ".join(
                            [note.to_lilypond(
                                key,
@@ -124,7 +143,10 @@ class Tune(list):
         self.time = time
         self.partial = partial
         
-    def to_lilypond(self, key, octave_offset=0):
+    def to_lilypond(self,
+                    key,
+                    octave_offset=0,
+                    shapes=None):
         """Return a Lilypond version of the tune"""
 
         # represent the partial beginning measure a la Lilypond if
@@ -140,7 +162,8 @@ class Tune(list):
         return ly % {"voices": "\n".join(
             [voice.to_lilypond(self.time,
                                key,
-                               octave_offset=octave_offset)
+                               octave_offset=octave_offset,
+                               shapes=shapes)
              for voice in self]),
                      "author": "",
                      "title": self.title,
@@ -286,12 +309,15 @@ if __name__ == "__main__":
 
     # set up argument parser and use it
     p = argparse.ArgumentParser()
-    p.add_argument("infile", help="the Doremi file to process")
-    p.add_argument("outfile", help="the Lilypond output file")
-    p.add_argument("--key", "-k", help="the key for the output file (e.g. \"A major\", \"c minor\", \"gis minor\")")
+    p.add_argument("infile",
+                   help="the Doremi file to process")
+    p.add_argument("outfile",
+                   help="the Lilypond output file")
+    p.add_argument("--key", "-k",
+                   help="the key for the output file (e.g. \"A major\", \"c minor\", \"gis minor\")")
 
-    # TODO: uncomment once this option is available
-    # p.add_argument("--shapes", "-s", help="use shape notes (i.e. \"aiken\", \"sacred-harp\")")
+    p.add_argument("--shapes", "-s",
+                   help="use shape notes (i.e. \"round\" (default), \"aikin\", \"sacredharp\", \"southernharmony\", \"funk\", \"walker\")")
     
     p.add_argument("--octaves", "-o", help="transpose up OCTAVES octaves")
     args = p.parse_args()
@@ -309,7 +335,8 @@ if __name__ == "__main__":
 
     # convert it to lilypond and write to the output file
     ly = tune.to_lilypond(args.key.lower(),
-                          octave_offset=octave_offset)
+                          octave_offset=octave_offset,
+                          shapes=args.shapes)
     
     outfile = codecs.open(args.outfile, "w", "utf-8")
     outfile.write(ly)
