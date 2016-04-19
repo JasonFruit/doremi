@@ -1,0 +1,190 @@
+\documentclass{article}
+\title{Doremi}
+\author{Jason R. Fruit}
+\date{2016}
+
+\usepackage{lineno}
+
+\begin{document}
+
+\maketitle
+
+\abstract{\textbf{Doremi} is a simple music-representation designed
+  especially for simple multi-part works in a vocal style, e.g. hymn
+  tunes and part songs.  It is based on movable-\textit{do} solfège,
+  and is intended to require as little understanding of traditional
+  musical notation as possible.}
+
+\tableofcontents
+
+\section{A simple example}
+
+Here is the common hymn tune \textit{Old Hundred} written in Doremi:
+
+\linenumbers
+\begin{verbatim}
+title: "Old Hundred"
+composer: "Louis Bourgeois"
+key: A major
+time: 4/2
+partial: 2
+voices: [{name: soprano
+          octave: 1
+          content: [2 do do - ti la sol + do re fermata mi
+                    mi mi mi re do fa mi fermata re
+                    do re mi re do - la ti + fermata do
+                    sol mi do re fa mi re fermata do]}
+         {name: alto
+	  octave: 0
+	  content: [2 sol sol sol mi mi mi sol sol
+	  	    sol sol + do - ti + do do do - ti
+		    + do - ti + do - sol sol la sol sol
+		    + do - sol la ti 4 slur la ti + 2 do - ti + do]}
+         {name: tenor
+	  octave: 0
+	  content: [2 mi mi re do - ti la ti + do
+	  	    do mi sol sol mi la sol sol
+		    mi sol sol fa sol 4 slur fa mi 2 re mi
+		    mi do mi sol la sol fa mi]}
+         {name: bass
+	  octave: 0
+	  content: [2 do do - sol la mi la sol do
+	  	    + do do do - sol la fa do sol
+	  	    la sol + do - sol mi fa sol do
+	  	    + do do - la sol re 4 slur mi fa 2 sol do]}]
+\end{verbatim}
+\nolinenumbers
+
+\section{The header}
+
+The heading (lines 1-5) is standard, and all its lines are required
+except for line 5, beginning \texttt{partial}.  The title and composer
+(lines 1 and 2) are mostly self-explanatory; note that they
+\textit{must} be enclosed in double quotation marks.
+
+The key signature (line 3) is the name of the key note (sharp is
+indicated by \texttt{\#}, flat by \texttt{b}) followed by its quality,
+either major or minor, e.g. \texttt{Ab major}, \texttt{F\# minor}.
+
+The time signature (line 4) must be written as a fraction
+(abbreviations such as \texttt{C} will not work).  There is no
+provision for mixed meter signatures.
+
+Line 5, beginning \texttt{partial:}, is optional; it specifies the
+length of the first measure if it is a partial (as opposed to
+complete) measure; the possible values are those of note durations
+(see \textbf{Note modifiers}, below).
+
+\section{Voices}
+
+A tune also has voices, which are indicated by the tag
+\texttt{voices:}.  It can have as many or as few voices as are
+specified by the template for which it is intended.  The list of
+voices is enclosed in square brackets (\texttt{{[]}}), and each voice
+is enclosed in curly braces (\texttt{\{\}}).
+
+Each voice has the same structure, similar to that of a tune.  It has
+a name (as in line 6); a beginning octave specification (line 7), and
+a list of notes (lines 8-11).
+
+\subsection{Name}
+
+The name is mostly self-explanatory, except that it is not a string
+and cannot contain spaces.  It must begin with an alphabetic
+character, and can only contain letters, numbers, and hyphens.  It is
+used in conjunction with templates to place the voices correctly.
+
+\subsection{Octave}
+
+The octave is specified by a positive or negative integer.  0 is the
+octave nearest the center, roughly speaking, of the average female
+voice; each higher octave adds 1, each lower octave subtracts.  (The
+octave can be modified by an overall octave offset specified at the
+command line, but the relation between voices remains constant.)
+
+\subsection{Content}
+
+The content of a voice consists of a list of notes and their
+modifiers.
+
+\subsection{Notes}
+
+The notes are specified by solfège syllables and a subset of their
+chromatic alterations:\\
+
+\begin{tabular}{| c | c |}
+
+  \hline
+  \textbf{Syllable} & \textbf{Pitch} \\
+  \hline
+  do & do\\
+  di & do$\sharp$\\
+  ra & re$\flat$\\
+  re & re\\
+  ri & re$\sharp$\\
+  me & mi$\flat$\\
+  mi & mi\\
+  fa & fa\\
+  fi & fa$\sharp$\\
+  se & sol$\flat$\\
+  sol & sol\\
+  si & sol$\sharp$\\
+  le & la$\flat$\\
+  la & la\\
+  li & la$\sharp$\\
+  te & ti$\flat$\\
+  ti & ti\\
+  \hline
+  
+\end{tabular}
+
+\subsection{Note modifiers}
+
+Each note may be preceded by a number of modifiers, which may be a
+number specifying a new note duration, a time signature, or one of the
+following:\\
+
+\begin{tabular}{| c | c |}
+
+  \hline
+  \textbf{Modifier} & \textbf{Meaning}\\
+  \hline
+  \texttt{fermata} & Add a fermata to the next note\\
+  \texttt{slur} & Start (or continue) a slur at the next note\\
+  \texttt{tie} & Tie the next note to the one after\\
+  \texttt{-} & Lower the octave of the next note\\
+  \texttt{+} & Raise the octave of the next note\\
+  \hline
+
+\end{tabular}
+
+\subsubsection*{Durations}
+
+Note durations are specified by a number indicating the denominator of
+the duration's fraction of a whole note:\\
+
+\begin{tabular}{| c | c |}
+
+  \hline
+  \textbf{Duration} & \textbf{Note type}\\
+  \hline
+  \texttt{1} & whole\\
+  \texttt{2} & half\\
+  \texttt{4} & quarter\\
+  \texttt{8} & eighth\\
+  \texttt{16} & sixteenth\\
+  \hline
+
+\end{tabular}\\
+
+\noindent
+A duration may be followed by a single dot if the intended note value
+is dotted.
+
+\subsubsection*{Time signature}
+
+Time signatures are specified exactly as in the tune header, and need
+only be specified in one voice; the other voices will receive the time
+signature change implicitly and be barred accordingly.
+
+\end{document}

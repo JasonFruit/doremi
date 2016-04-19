@@ -149,6 +149,8 @@ class Tune(list):
                     shapes=None):
         """Return a Lilypond version of the tune"""
 
+        key = key_to_lilypond(key)
+
         # represent the partial beginning measure a la Lilypond if
         # necessary
         if self.partial:
@@ -326,12 +328,15 @@ if __name__ == "__main__":
         octave_offset = int(args.octaves)
     else:
         octave_offset = 0
-        
+
     # parse the Doremi file
     lc = DoremiParser(args.infile)
 
     # convert it to the internal representation
     tune = lc.convert()
+
+    if not args.key:
+        args.key = tune.key
 
     # convert it to lilypond and write to the output file
     ly = tune.to_lilypond(args.key.lower(),

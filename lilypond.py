@@ -322,3 +322,16 @@ keys["dis minor"] = keys['fis major']
 
 def syllable_to_note(syllable, key):
     return keys[key.lower()][syllable]
+
+def key_to_lilypond(key):
+    elems = key.split(" ")
+    if len(elems[0]) == 2:
+        chars = [c for c in elems[0]]
+        if chars[1] == "b":
+            chars[1] = "es"
+        elif chars[1] == "#":
+            chars[1] = "is"
+        elems[0] = "".join(chars)
+        if elems[0] == "ees":
+            elems[0] = "es"
+    return " ".join(elems)
