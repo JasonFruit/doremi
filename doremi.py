@@ -9,6 +9,7 @@ part-songs, and other brief, likely vocal works.
 from __future__ import print_function
 import codecs
 import argparse
+import copy
 
 from parsimonious import Grammar, NodeVisitor
 
@@ -37,15 +38,25 @@ degree, duration, octave, and other information"""
             return "%s%s" % (self.pitch, self.duration)
         
         pitch = syllable_to_note(self.pitch, key)
-        octave = self.octave + octave_offset
+        octave = self.octave + octave_offset + 1
 
-        # convert internal octave representation, do->ti, to Lilypond,
-        # which uses c->b
+        # convert internal octave representation to Lilypond, which
+        # uses c->b
         offset = key_octave_offset[key.lower()]
+
+        local_pitch_level = copy.copy(pitch_level)
+
+        # adjust the local copy of the pitch-level order to go from
+        # la->sol if key is minor
+        if "minor" in key.lower():
+            for k in local_pitch_level.keys():
+                local_pitch_level[k] = local_pitch_level[k] + 2
+                if local_pitch_level[k] > 6:
+                    local_pitch_level[k] -= 7
         
-        if pitch_level[self.pitch] - offset < 0:
+        if local_pitch_level[self.pitch] - offset < 0:
             octave -= 1
-        elif pitch_level[self.pitch] - offset > 6:
+        elif local_pitch_level[self.pitch] - offset > 6:
             octave += 1
 
         if octave < 0:
