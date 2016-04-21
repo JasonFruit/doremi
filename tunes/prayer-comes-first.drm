@@ -1,0 +1,31 @@
+title: "Prayer Comes First"
+composer: "Jason R. Fruit"
+key: D major
+time: 4/4
+voices: [{name: soprano
+	  octave: 0
+          content: [8 mi sol sol la sol 4 mi 8 do re do do re 2 mi
+                    8 mi sol sol la sol 4 mi 8 do mi re re mi 2 re
+                    8 mi sol sol la sol 4 mi 8 do re do do re slur 4. mi 8 mi
+                    8 sol sol sol la + do - 4 la 8 mi re do do re 2 do]}
+         
+         {name: alto
+	  octave: 0
+          content: [8 do do do do mi 4 do 8 do do do do - la + 2 do
+                    8 do do do do mi 4 do 8 do do do do do - 2 ti
+                    + 8 do do do do mi 4 do 8 do do do do -  la + slur 4. do 8 do
+                    8 do do do do sol 4 mi 8 do - la la la ti + 2 do]}
+         
+         {name: tenor
+	  octave: -1
+          content: [8 sol mi mi fa sol 4 sol 8 sol la la la fa 2 sol
+                    8 sol mi mi fa sol 4 sol 8 mi sol fi fi fi 4 slur sol fa
+                    8 mi mi mi fa sol 4 sol 8 sol la la la fa 4. slur sol 8 sol
+                    + 8 do do do - la + do 4 do 8 - sol fi fi fa fa 2 mi]}
+         
+         {name: bass
+	  octave: -1
+          content: [8 do do do do do 4 do 8 mi fa fa fa fa 2 do
+                    8 do do do do do 4 do 8 do - la la + re re - 2 sol
+                    + 8 do do do do do 4 do 8 mi fa fa fa fa 4. slur do 8 do
+                    8 mi mi mi fa mi 4 la - 8 la + re re - sol sol + 2 do]}]

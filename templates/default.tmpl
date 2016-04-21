@@ -8,8 +8,9 @@
 
 \header {
   poet = "%(author)s"
-  instrument = \markup { \smallCaps "%(title)s" }
-  composer = \markup { \smallCaps { "%(composer)s" }}
+  title = \markup { "%(lyrictitle)s" }
+  instrument = \markup { \smallCaps "%(title)s (%(meter)s)" }
+  composer = "%(composer)s"
   tagline = ""
 }
 
@@ -24,6 +25,7 @@
 	    \new Voice = "one" {
 	      \stemUp \slurUp \tieUp %(partial)s  \exportedvoice_soprano_music
 	    }
+	    %(lyrics)s
 	    \new Voice = "two" { \stemDown \slurDown \tieDown  \exportedvoice_alto_music }
 	  >>
 	}

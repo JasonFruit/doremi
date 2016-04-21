@@ -1,0 +1,20 @@
+title: "TITLE"
+composer: "COMPOSER"
+key: C major
+time: 4/4
+partial: 0
+voices: [{name: soprano
+	  octave: 1
+          content: [4 do]}
+         
+         {name: alto
+	  octave: 0
+          content: [4 do]}
+         
+         {name: tenor
+	  octave: 0
+          content: [4 do]}
+         
+         {name: bass
+	  octave: 0
+          content: [4 do]}]

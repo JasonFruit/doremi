@@ -14,6 +14,7 @@ import copy
 from parsimonious import Grammar, NodeVisitor
 
 from lilypond import *
+from lyrics import Lyric
 
 class Note(object):
     """Represents a note (or rest) in a musical work, including scale
@@ -157,7 +158,8 @@ class Tune(list):
     def to_lilypond(self,
                     key,
                     octave_offset=0,
-                    shapes=None):
+                    shapes=None,
+                    lyric=None):
         """Return a Lilypond version of the tune"""
 
         key = key_to_lilypond(key)
@@ -178,10 +180,13 @@ class Tune(list):
                                octave_offset=octave_offset,
                                shapes=shapes)
              for voice in self]),
-                     "author": "",
+                     "author": lyric.author,
+                     "lyrictitle": lyric.title,
+                     "meter": lyric.meter,
                      "title": self.title,
                      "composer": self.composer,
-                     "partial": partial}
+                     "partial": partial,
+                     "lyrics": lyric.to_lilypond()}
                             
 
 def get_node_val(node, val_type):
@@ -307,7 +312,7 @@ class DoremiParser(NodeVisitor):
     def visit_number(self, node, vc):
         # all numbers except note durations are handled at a higher level
         if self.in_content:
-            self.note.duration = int(node.text)
+            self.note.duration = node.text
             
     def generic_visit(self, node, vc):
         # set whether we're in the note-content of a voice based on
@@ -333,12 +338,25 @@ if __name__ == "__main__":
                    help="use shape notes (i.e. \"round\" (default), \"aikin\", \"sacredharp\", \"southernharmony\", \"funk\", \"walker\")")
     
     p.add_argument("--octaves", "-o", help="transpose up OCTAVES octaves")
+
+    p.add_argument("--lyricfile", "-l", help="the file containing the lyrics")
+    
     args = p.parse_args()
 
     if args.octaves:
         octave_offset = int(args.octaves)
     else:
         octave_offset = 0
+
+    if args.lyricfile:
+        try:
+            text = codecs.open(args.lyricfile, "r", "utf-8").read()
+        except:
+            raise Exception("Unable to open lyric file '%s'." % args.lyricfile)
+        
+        lyric = Lyric(text)
+    else:
+        lyric = Lyric("")
 
     # parse the Doremi file
     lc = DoremiParser(args.infile)
@@ -352,7 +370,8 @@ if __name__ == "__main__":
     # convert it to lilypond and write to the output file
     ly = tune.to_lilypond(args.key.lower(),
                           octave_offset=octave_offset,
-                          shapes=args.shapes)
+                          shapes=args.shapes,
+                          lyric=lyric)
     
     outfile = codecs.open(args.outfile, "w", "utf-8")
     outfile.write(ly)
