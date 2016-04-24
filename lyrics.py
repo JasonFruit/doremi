@@ -14,6 +14,7 @@ class Lyric(object):
             author_rgx = compile(r'author:\s*"([^"]*)"')
             meter_rgx = compile(r'meter:\s*"([^"]*)"')
             verse_rgx = compile(r'\{\s*([^\}]*)\s*\}')
+            word_div_rgx = compile(r"\s+")
 
             self.title = title_rgx.findall(text)[0]
             self.author = author_rgx.findall(text)[0]
@@ -22,6 +23,8 @@ class Lyric(object):
             except (IndexError, ValueError):
                 pass # it's already empty
             self.verses = verse_rgx.findall(text)
+            self.verses = [" ".join(word_div_rgx.split(verse))
+                           for verse in self.verses]
 
     def to_lilypond(self):
         return "\n".join([r"""\new Lyrics \lyricsto "one"

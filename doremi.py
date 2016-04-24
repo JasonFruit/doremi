@@ -332,14 +332,16 @@ if __name__ == "__main__":
     p.add_argument("outfile",
                    help="the Lilypond output file")
     p.add_argument("--key", "-k",
-                   help="the key for the output file (e.g. \"A major\", \"c minor\", \"gis minor\")")
+                   help='the key for the output file (e.g. "A major", "c minor", "gis minor")')
 
     p.add_argument("--shapes", "-s",
-                   help="use shape notes (i.e. \"round\" (default), \"aikin\", \"sacredharp\", \"southernharmony\", \"funk\", \"walker\")")
+                   help='use shape notes (i.e. "round" (default), "aikin", "sacredharp", "southernharmony", "funk", "walker")')
     
     p.add_argument("--octaves", "-o", help="transpose up OCTAVES octaves")
 
-    p.add_argument("--lyricfile", "-l", help="the file containing the lyrics")
+    p.add_argument("--lyricfile",
+                   "-l",
+                   help="the file containing the lyrics")
     
     args = p.parse_args()
 
@@ -348,15 +350,21 @@ if __name__ == "__main__":
     else:
         octave_offset = 0
 
+    # try to load the lyric file; if none is specified, use an empty
+    # Lyric
     if args.lyricfile:
         try:
             text = codecs.open(args.lyricfile, "r", "utf-8").read()
-        except:
+        except FileNotFoundError:
             raise Exception("Unable to open lyric file '%s'." % args.lyricfile)
         
         lyric = Lyric(text)
     else:
         lyric = Lyric("")
+
+    # correct a common misspelling
+    if args.shapes and args.shapes.lower() == "aiken":
+        args.shapes = "aikin"
 
     # parse the Doremi file
     lc = DoremiParser(args.infile)
