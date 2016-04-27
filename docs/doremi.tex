@@ -189,4 +189,37 @@ Time signatures are specified exactly as in the tune header, and need
 only be specified in one voice; the other voices will receive the time
 signature change implicitly and be barred accordingly.
 
+\section{Lyrics}
+
+Lyrics are stored in separate files from the tunes to which they are
+applied, to facilitate the common practice of singing any number of
+hymns to a single hymn tune.  Here is a simple example of a lyric
+file:
+
+\resetlinenumber
+\linenumbers
+\begin{verbatim}
+title: "Prayer Comes First"
+author: "Larry and Belinda Pearl"
+meter: "12.12.12.12"
+content: [{voice: soprano
+           verses=[{Things in life don't hap- pen just like we've al- ways planned.
+                    Ways to solve our prob- lems aren't gi- ven to a man.
+                    Ma- ny times we try hard, but fail to make them right,
+                    For man works in dark- ness, but "God --" He works in light.}
+                   {Our vain ef- forts gi- ven, we're left so deep in woe.
+                    Man's hands could- n't help us, so to our knees we go.
+                    Fi- nal- ly, we get there, when things are at their "worst.
+                    In" prayer we talk with God, but we should have gone there first.}
+                   {Fer- vent prayer should ne- ver be just a last re- sort.
+                    Pray first to the Fa- ther, and bask in His sup- port.
+                    Let your heart turn up- ward and praise the lov- ing Lord.
+                    Take those prob- lems to "Him --" sal- va- tion's in God's Word!}]}]
+\end{verbatim}
+\nolinenumbers
+
+The format is similar to a Doremi tune file.  The format for string
+properties is the same (e.g. lines 1-3), and the square-bracketed list
+of curly-braced items is the same.  Inside 
+
 \end{document}
