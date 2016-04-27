@@ -3,8 +3,8 @@ part-songs, and other brief, likely vocal works.
 
 """
 
-# TODO: implement repeats; figure out how to make fermatas in bass
-# staves upside-down in the template
+# TODO figure out how to make fermatas in bass staves upside-down in
+# the template
 
 from __future__ import print_function
 import codecs
@@ -64,12 +64,18 @@ degree, duration, octave, and other information"""
         else:
             octave = "'" * octave
 
-        # start or end slurs as indicated by modifiers
+        # start or end slurs (or beams) as indicated by modifiers
         slur = ""
         if "slur" in self.modifiers:
-            slur = "("
+            if self.duration in ["8", "8.", "16"]:
+                slur = "["
+            else:
+                slur = "("
         elif "end slur" in self.modifiers:
-            slur = ")"
+            if self.duration in ["8", "8.", "16"]:
+                slur = "]"
+            else:
+                slur = ")"
 
         # ties only ever connect two notes, so need not be explicitly
         # terminated
@@ -83,13 +89,22 @@ degree, duration, octave, and other information"""
         else:
             fermata = ""
 
+        repeat = ""
+        if "|:" in self.modifiers:
+            repeat = r"\repeat volta 2 {"
+            
+        if ":|" in self.modifiers:
+            repeat += "}"
+            
+
         # assemble and return the Lilypond string
-        return "%s%s%s%s%s%s" % (pitch,
-                                 octave,
-                                 self.duration,
-                                 tie,
-                                 slur,
-                                 fermata)
+        return "%s%s%s%s%s%s%s" % (repeat,
+                                   pitch,
+                                   octave,
+                                   self.duration,
+                                   tie,
+                                   slur,
+                                   fermata)
             
 class Voice(list):
     """Represents a named part in a vocal-style composition"""

@@ -1,0 +1,26 @@
+title: "Imandra"
+composer: "Ananias Davison"
+key: A minor
+time: 4/4
+partial: 2
+voices: [{name: soprano
+	  octave: 0
+          content: [|: 4 slur mi sol + 2 la 8 slur la - sol 4 mi + 2 do 4 re
+                    re 2 mi 8 slur mi re 4 do 2 la :|
+                    4 slur do re 2 mi 4 do sol 2 mi - 4 sol
+                    sol + 2 la 8 slur la - sol 4 mi 2 sol
+                    + 4 slur do ti 2 la 8 slur la - sol 4 mi + 2 do 4 re
+                    re 2 mi 8 slur mi re 4 ti 2 la
+                    ]}
+         
+         {name: alto
+	  octave: 0
+          content: [4 do]}
+         
+         {name: tenor
+	  octave: 0
+          content: [4 do]}
+         
+         {name: bass
+	  octave: 0
+          content: [4 do]}]
