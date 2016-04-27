@@ -21,29 +21,29 @@
     ("[{}[\]]" . font-lock-builtin-face))     ;; brackets
   "Highlighting expressions for Doremi 2e major mode")
 
-;;;indentation rules
-;; 1. everything is indented to the column after the last open brace
-;;    or bracket
 
-(defun doremi2-indent-line ()
-  (interactive)
-  (beginning-of-line)
+(defun doremi2-indent-line () ;; starts from beginning of file, since
+  (interactive)               ;; they're usually short, and it's
+  (beginning-of-line)         ;; simpler
+
   (if (bobp)
-      (indent-line-to 0)
+      
+      (indent-line-to 0)      ;; if you're at the beginning of the
+			      ;; buffer, don't indent
     (let ((cur-point (point))
-	  (indents '(0))
+	  (indents '(0))      ;; stack of indentation points
 	  (line-start 0))
       (beginning-of-buffer)
       (while (not (= (point) cur-point))
 	(if (bolp) (setq line-start (point)))
 	(if (or (= (char-after) 91)
 		(= (char-after) 123))
-	    (setq indents (cons (+ (- (point) line-start) 1) indents)))
+	    (setq indents (cons (+ (- (point) line-start) 1) indents)))  ;; push the new indent point to the stack
 	(if (or (= (char-after) 93)
 		(= (char-after) 125))
-	    (setq indents (cdr indents)))
+	    (setq indents (cdr indents)))  ;; pop an indent off the stack
 	(forward-char))
-      (indent-line-to (car indents)))))
+      (indent-line-to (car indents)))))  ;; use the indent on top of the stack
 
 (defvar doremi2-mode-syntax-table
   (let ((st (make-syntax-table)))

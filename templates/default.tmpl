@@ -22,21 +22,26 @@
 	\new Staff = "treble" {
 	  <<
 	    \clef treble
-	    \new Voice = "one" {
+	    \new Voice = "exportedvoice_soprano" {
 	      \stemUp \slurUp \tieUp %(partial)s  \exportedvoice_soprano_music
 	    }
-	    %(lyrics)s
-	    \new Voice = "two" { \stemDown \slurDown \tieDown  \exportedvoice_alto_music }
+    	    %(soprano_lyrics)s
+	    \new Voice = "exportedvoice_alto" { \stemDown \slurDown \tieDown  \exportedvoice_alto_music }
+    	    %(alto_lyrics)s
 	  >>
+
 	}
 	\new Staff = "bass" {
 	  \clef bass
 	  <<
 	    
-	    \new Voice = "three" { \stemUp \slurUp \tieUp  \exportedvoice_tenor_music }
-	    \new  Voice = "four" { \stemDown \slurDown \tieDown \exportedvoice_bass_music }
+	    \new Voice = "exportedvoice_tenor" { \stemUp \slurUp \tieUp  \exportedvoice_tenor_music }
+    	    %(tenor_lyrics)s
+	    \new  Voice = "exportedvoice_bass" { \stemDown \slurDown \tieDown \exportedvoice_bass_music }
+    	    %(bass_lyrics)s	    
 	  >>
 	}
+
       >>
     }
     

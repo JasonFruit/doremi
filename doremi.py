@@ -14,7 +14,7 @@ import copy
 from parsimonious import Grammar, NodeVisitor
 
 from lilypond import *
-from lyrics import Lyric
+from lyric_parser import Lyric, LyricParser
 
 class Note(object):
     """Represents a note (or rest) in a musical work, including scale
@@ -173,8 +173,8 @@ class Tune(list):
 
         # TODO: make this allow other templates
         ly = codecs.open("templates/default.tmpl", "r", "utf-8").read()
-        
-        return ly % {"voices": "\n".join(
+
+        tmpl_data = {"voices": "\n".join(
             [voice.to_lilypond(self.time,
                                key,
                                octave_offset=octave_offset,
@@ -185,8 +185,15 @@ class Tune(list):
                      "meter": lyric.meter,
                      "title": self.title,
                      "composer": self.composer,
-                     "partial": partial,
-                     "lyrics": lyric.to_lilypond()}
+                     "partial": partial}
+
+        for voice in self:
+            tmpl_data["%s_lyrics" % voice.name] = ""
+            
+        for lvoice in lyric.voices:
+            tmpl_data["%s_lyrics" % lvoice.name] = lvoice.to_lilypond()
+                    
+        return ly % tmpl_data
                             
 
 def get_node_val(node, val_type):
@@ -207,6 +214,7 @@ raise a ValueError"""
         
 class DoremiParser(NodeVisitor):
     def __init__(self, tune_fn):
+        NodeVisitor.__init__(self)
         # start with an empty tune, voice, note, and list of modifiers
         self.tune = Tune()
         self.voice = Voice()
@@ -352,15 +360,14 @@ if __name__ == "__main__":
 
     # try to load the lyric file; if none is specified, use an empty
     # Lyric
+    lyric = Lyric()
+    
     if args.lyricfile:
         try:
             text = codecs.open(args.lyricfile, "r", "utf-8").read()
+            lyric = LyricParser(text).convert()
         except FileNotFoundError:
             raise Exception("Unable to open lyric file '%s'." % args.lyricfile)
-        
-        lyric = Lyric(text)
-    else:
-        lyric = Lyric("")
 
     # correct a common misspelling
     if args.shapes and args.shapes.lower() == "aiken":
