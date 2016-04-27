@@ -1,0 +1,17 @@
+lyric = title ws author ws meter ws content
+title = "title" ws ":" ws string
+author = "author" ws ":" ws string
+meter = "meter" ws ":" ws string
+content = "content" ws ":" ws "[" ws (voicespec ws)+ "]"
+voicespec = "{" ws voice ws verses ws "}"
+voice = "voice" ws ":" ws name ws
+verses = "verses" ws ":" ws "[" ws (verse ws)+ ws "]"
+verse = "{" ws words ws "}"
+words = ws (word ws)+
+word = ~r"[^\}\s]+"
+name = ~r"[A-Za-z]" ~r"[A-Za-z0-9\-#]*"
+string = "\"" text "\""
+text = ~'[^"]*'
+ws = (nl / s)*
+nl = ("\n" / "\r\n")
+s = ~"\s"

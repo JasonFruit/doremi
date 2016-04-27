@@ -1,0 +1,50 @@
+title: "Goble"
+composer: ""
+key: G major
+time: 4/4
+partial: 4
+voices: [{name: soprano
+	  octave: 0
+          content: [8 sol + do 4 do mi do - la 2. sol
+                    + 8 do re 4 mi mi 8 mi do re mi 2. re
+                    8 mi fa 4 sol mi do mi 2. do
+                    8 do re 4 mi fa 8 mi do re re 2. do
+
+                    8 mi sol 2. sol 8 mi re 2. do
+                    8 do re 4 mi mi do mi 2. re
+                    8 mi fa 4 sol mi do mi 2. do
+                    8 do re 4 mi fa 8 mi do re re 2. do]}
+         
+         {name: alto
+	  octave: 0
+          content: [8 sol la 4 sol + do - la fa 2. sol
+                    8 sol sol + 4 do do 8 do do - sol + do 2. - ti
+                    8 sol sol + 4 do do do - sol 2. fa
+                    8 sol la + 4 do do 8 do do - ti ti + 2. do
+                    4 r do - la sol r sol la sol
+                    r + do do do do - ti + do - ti
+                    r + mi do do do - fa fa fa
+                    r + do do do - ti sol la sol]}
+         
+         {name: tenor
+	  octave: 0
+          content: [8 mi fa 4 mi sol fa fa 2. mi
+                    8 mi fa 4 sol sol 8 sol mi sol la 2. sol
+                    8 do re 4 mi sol la te 2. la
+                    8 sol fa 4 sol fa 8 sol mi fa sol 2. mi
+
+                    4 r mi fa mi r mi fa mi
+                    4 r mi mi fa sol re mi re
+                    4 r sol sol la te la la la
+                    4 r sol fa sol sol mi fa mi]}
+         
+         {name: bass
+	  octave: 0
+          content: [8 do do 4 do - mi fa fa + 2. do
+                    8 do do 4 do do 8 do do - ti la 2. sol
+                    + 8 do do 4 do do - la mi 2. fa
+                    8 mi fa 4 sol la 8 sol sol sol sol 2. do
+                    + 4 r do do do r do - fa do
+                    + 4 r do do - la mi sol sol sol
+                    + 4 r do do - la sol fa fa fa
+                    4 r sol la sol sol do do do]}]
