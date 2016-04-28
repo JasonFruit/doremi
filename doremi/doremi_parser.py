@@ -11,8 +11,8 @@ import copy
 
 from parsimonious import Grammar, NodeVisitor
 
-from lilypond import *
-from lyric_parser import Lyric, LyricParser
+from doremi.lilypond import *
+from doremi.lyric_parser import Lyric, LyricParser
 
 class RepeatMarker(object):
     def __init__(self, text):
@@ -134,7 +134,8 @@ class Voice(list):
                     time,
                     key,
                     octave_offset=0,
-                    shapes=None):
+                    shapes=None,
+                    template="default"):
         """A representation of the voice as a Lilypond string"""
 
         # association of doremi shape args and Lilypond shape commands
@@ -156,7 +157,7 @@ class Voice(list):
             if "minor" in key:
                 lshapes += lparts[1]
 
-        tmpl = codecs.open("templates/default-voice.tmpl",
+        tmpl = codecs.open("templates/%s-voice.tmpl" % template,
                            "r",
                            "utf-8").read()
         
@@ -189,7 +190,8 @@ class Tune(list):
                     key,
                     octave_offset=0,
                     shapes=None,
-                    lyric=None):
+                    lyric=None,
+                    template="default"):
         """Return a Lilypond version of the tune"""
 
         key = key_to_lilypond(key)
@@ -202,13 +204,14 @@ class Tune(list):
             partial = ""
 
         # TODO: make this allow other templates
-        ly = codecs.open("templates/default.tmpl", "r", "utf-8").read()
+        ly = codecs.open("templates/%s.tmpl" % template, "r", "utf-8").read()
 
         tmpl_data = {"voices": "\n".join(
             [voice.to_lilypond(self.time,
                                key,
                                octave_offset=octave_offset,
-                               shapes=shapes)
+                               shapes=shapes,
+                               template=template)
              for voice in self]),
                      "author": lyric.author,
                      "lyrictitle": lyric.title,

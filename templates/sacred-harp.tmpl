@@ -1,0 +1,34 @@
+\version "2.14.2"
+
+\header {
+ title = \markup { "%(title)s %(meter)s" }
+ poet = \markup { "%(author)s" }
+ composer = "%(composer)s"
+ tagline = ""
+}
+
+#(set-default-paper-size "letter" 'landscape)
+
+%(voices)s
+
+\score
+{
+  <<
+    \new Voice = "exportedvoice_treble" { \clef treble \exportedvoice_treble_music }
+    %(treble_lyrics)s
+    \new Voice = "exportedvoice_alto" { \clef alto \exportedvoice_alto_music }
+    %(alto_lyrics)s
+    \new Voice = "exportedvoice_lead" { \clef treble \exportedvoice_lead_music }
+    %(lead_lyrics)s
+    \new  Voice = "exportedvoice_bass" { \clef bass \exportedvoice_bass_music }
+    %(bass_lyrics)s
+  >>
+
+  \layout {
+    indent = 0 \cm
+    firstpagenumber =  no
+    papersize = letter
+  }
+
+  \midi { }
+}

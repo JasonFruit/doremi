@@ -4,8 +4,8 @@ from __future__ import print_function
 import codecs
 import argparse
 
-from doremi_parser import DoremiParser
-from lyric_parser import Lyric, LyricParser
+from doremi.doremi_parser import DoremiParser
+from doremi.lyric_parser import Lyric, LyricParser
 
 # set up argument parser and use it
 p = argparse.ArgumentParser()
@@ -24,6 +24,10 @@ p.add_argument("--octaves", "-o", help="transpose up OCTAVES octaves")
 p.add_argument("--lyricfile",
                "-l",
                help="the file containing the lyrics")
+
+p.add_argument("--template",
+               "-t",
+               help='the output template name, e.g. "default", "sacred-harp"')
 
 args = p.parse_args()
 
@@ -47,6 +51,9 @@ if args.lyricfile:
 if args.shapes and args.shapes.lower() == "aiken":
     args.shapes = "aikin"
 
+if not args.template:
+    args.template = "default"
+    
 # parse the Doremi file
 lc = DoremiParser(args.infile)
 
@@ -60,7 +67,8 @@ if not args.key:
 ly = tune.to_lilypond(args.key.lower(),
                       octave_offset=octave_offset,
                       shapes=args.shapes,
-                      lyric=lyric)
+                      lyric=lyric,
+                      template=args.template)
 
 outfile = codecs.open(args.outfile, "w", "utf-8")
 outfile.write(ly)
