@@ -1,9 +1,11 @@
+#!/usr/bin/env python
+
+from __future__ import print_function
 import codecs
+import argparse
 
 from doremi_parser import DoremiParser
 from lyric_parser import Lyric, LyricParser
-
-import argparse
 
 # set up argument parser and use it
 p = argparse.ArgumentParser()

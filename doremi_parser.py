@@ -1,12 +1,11 @@
 """A simple music-representation language suitable for hymn tunes,
-part-songs, and other brief, likely vocal works.
+part-songs, and other brief, vocal-style works.
 
 """
 
-# TODO figure out how to make fermatas in bass staves upside-down in
+# TODO: figure out how to make fermatas in bass staves upside-down in
 # the template
 
-from __future__ import print_function
 import codecs
 import copy
 
@@ -14,6 +13,25 @@ from parsimonious import Grammar, NodeVisitor
 
 from lilypond import *
 from lyric_parser import Lyric, LyricParser
+
+class RepeatMarker(object):
+    def __init__(self, text):
+        self.text = text
+    def to_lilypond(self, *args, **kwargs):
+        if self.text == "|:":
+            return r"\repeat volta 2 {"
+        elif self.text == ":|":
+            return r"}"
+        elif self.text == "!":
+            return r"} \alternative { {"
+        elif self.text == "1!":
+            return r"} {"
+        elif self.text == "2!":
+            return r"} }"
+        elif self.text == "|.":
+            return r'\bar "|."'
+        elif self.text == "||":
+            return r'\bar "||"'
 
 class Note(object):
     """Represents a note (or rest) in a musical work, including scale
@@ -31,7 +49,6 @@ degree, duration, octave, and other information"""
         """
         Convert to an equivalent Lilypond representation
         """
-        #TODO: consider moving to lilypond.py
 
         # short-circuit if this is a rest
         if self.pitch == "r":
@@ -89,22 +106,13 @@ degree, duration, octave, and other information"""
         else:
             fermata = ""
 
-        repeat = ""
-        if "|:" in self.modifiers:
-            repeat = r"\repeat volta 2 {"
-            
-        if ":|" in self.modifiers:
-            repeat += "}"
-            
-
         # assemble and return the Lilypond string
-        return "%s%s%s%s%s%s%s" % (repeat,
-                                   pitch,
-                                   octave,
-                                   self.duration,
-                                   tie,
-                                   slur,
-                                   fermata)
+        return "%s%s%s%s%s%s" % (pitch,
+                                 octave,
+                                 self.duration,
+                                 tie,
+                                 slur,
+                                 fermata)
             
 class Voice(list):
     """Represents a named part in a vocal-style composition"""
@@ -114,6 +122,14 @@ class Voice(list):
         list.__init__(self)
         self.name = name
         self.octave = octave # the starting octave for the part
+    def last_note(self):
+        index = -1
+        try:
+            while type(self[index]) != Note:
+                index -= 1
+            return self[index]
+        except IndexError:
+            raise IndexError("No previous notes")
     def to_lilypond(self,
                     time,
                     key,
@@ -297,7 +313,7 @@ class DoremiParser(NodeVisitor):
         # if there's no duration explicit, it's the same as the
         # previous note in the same voice
         if not self.note.duration:
-            self.note.duration = self.voice[-1].duration
+            self.note.duration = self.voice.last_note().duration
             
         self.note.modifiers = self.note_modifiers
         self.note.pitch = node.text
@@ -305,7 +321,7 @@ class DoremiParser(NodeVisitor):
         # if there's a previous note, start from its octave; if not,
         # start from the voice's octave
         try:
-            self.note.octave = self.voice[-1].octave
+            self.note.octave = self.voice.last_note().octave
         except IndexError:
             self.note.octave = self.voice.octave
 
@@ -319,7 +335,7 @@ class DoremiParser(NodeVisitor):
         # if a slur started on the previous note and is not continued
         # by this one, explicitly end it
         try:
-            if "slur" in self.voice[-1].modifiers:
+            if "slur" in self.voice.last_note().modifiers:
                 if not "slur" in self.note.modifiers: 
                     self.note.modifiers.append("end slur")
         except IndexError:
@@ -330,6 +346,9 @@ class DoremiParser(NodeVisitor):
         self.voice.append(self.note)
         self.note = Note()
         self.note_modifiers = []
+
+    def visit_repeat(self, node, vc):
+        self.voice.append(RepeatMarker(node.text))
         
     def visit_number(self, node, vc):
         # all numbers except note durations are handled at a higher level

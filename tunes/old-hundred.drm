@@ -5,10 +5,10 @@ time: 4/2
 partial: 2
 voices: [{name: soprano
 	  octave: 1
-          content: [2 do do - ti la sol + do re fermata mi
-	  	    mi mi mi re do fa mi fermata re
-		    do re mi re do - la ti + fermata do
-		    sol mi do re fa mi re fermata do]}
+          content: [2 do do - ti la sol + do re fermata mi ||
+	  	    mi mi mi re do fa mi fermata re ||
+		    do re mi re do - la ti + fermata do ||
+		    sol mi do re fa mi re fermata do |.]}
          
          {name: alto
 	  octave: 0

@@ -7,7 +7,7 @@ voices: [{name: soprano
           content: [8 mi sol sol la sol 4 mi 8 do re do do re 2 mi
                     8 mi sol sol la sol 4 mi 8 do mi re re mi 2 re
                     8 mi sol sol la sol 4 mi 8 do re do do re slur 4. mi 8 mi
-                    8 sol sol sol la + do - 4 la 8 mi re do do re 2 do]}
+                    8 sol sol sol la + do - 4 la 8 mi re do do re 2 do |.]}
          
          {name: alto
 	  octave: 0
