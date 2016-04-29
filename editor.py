@@ -7,6 +7,14 @@ import gtk, pango
 
 notes = ["do", "re", "mi", "fa", "sol", "la", "ti"]
 
+chromatics = {"do": (None, "di"),
+              "re": ("ra", "ri"),
+              "mi": ("me", None),
+              "fa": (None, "fi"),
+              "sol": ("se", "si"),
+              "la": ("le", "li"),
+              "ti": ("te", None)}
+
 durations = [u"\U0001D15D",
              u"\U0001D15E",
              u"\U0001D15F",
@@ -19,6 +27,11 @@ barlines = [u"\U0001D106",
             u"\U0001D102"]
 
 endings = ["{1}", "{2}"]
+
+def toolbar_separator():
+    sep = gtk.Label("")
+    sep.set_size_request(10, 0)
+    return sep
 
 class MainWindow(gtk.Window):
     def __init__(self):
@@ -41,8 +54,8 @@ class MainWindow(gtk.Window):
             btn.set_size_request(50, 50)
             notation_buttons.pack_start(btn, False)
 
-        sep = gtk.VSeparator()
-        notation_buttons.pack_start(sep)
+        sep = toolbar_separator()
+        notation_buttons.pack_start(sep, False)
         
         for duration in durations:
             btn = gtk.Button(duration)
@@ -51,18 +64,26 @@ class MainWindow(gtk.Window):
             btn.set_size_request(50, 50)
             notation_buttons.pack_start(btn, False)
 
-        sep = gtk.VSeparator()
-        notation_buttons.pack_start(sep)
+        sep = toolbar_separator()
+        notation_buttons.pack_start(sep, False)
         
         self.sharp_btn = gtk.Button(u"\u266F")
         self.sharp_btn.child.modify_font(pango.FontDescription("24"))
         self.sharp_btn.set_size_request(50, 50)
         notation_buttons.pack_start(self.sharp_btn, False)
 
+        self.natural_btn = gtk.Button(u"\u266E")
+        self.natural_btn.child.modify_font(pango.FontDescription("24"))
+        self.natural_btn.set_size_request(50, 50)
+        notation_buttons.pack_start(self.natural_btn, False)
+
         self.flat_btn = gtk.Button(u"\u266D")
         self.flat_btn.child.modify_font(pango.FontDescription("24"))
         self.flat_btn.set_size_request(50, 50)
         notation_buttons.pack_start(self.flat_btn, False)
+
+        sep = toolbar_separator()
+        notation_buttons.pack_start(sep, False)
         
         for barline in barlines:
             btn = gtk.Button(barline)
