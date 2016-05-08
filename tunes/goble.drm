@@ -24,7 +24,7 @@ voices: [{name: soprano
                     4 r do - la sol r sol la sol
                     r + do do do do - ti + do - ti
                     r + mi do do do - fa fa fa
-                    r + do do do - ti sol la sol]}
+                    r + do do do - ti sol la sol |.]}
          
          {name: tenor
 	  octave: 0
@@ -36,7 +36,7 @@ voices: [{name: soprano
                     4 r mi fa mi r mi fa mi
                     4 r mi mi fa sol re mi re
                     4 r sol sol la te la la la
-                    4 r sol fa sol sol mi fa mi]}
+                    4 r sol fa sol sol mi fa mi |.]}
          
          {name: bass
 	  octave: 0
@@ -47,4 +47,4 @@ voices: [{name: soprano
                     + 4 r do do do r do - fa do
                     + 4 r do do - la mi sol sol sol
                     + 4 r do do - la sol fa fa fa
-                    4 r sol la sol sol do do do]}]
+                    4 r sol la sol sol do do do |.]}]

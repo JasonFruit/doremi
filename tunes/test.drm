@@ -1,0 +1,28 @@
+title: "TITLE"
+composer: "COMPOSER"
+key: C major
+time: 4/4
+partial: 0
+voices: [{name: soprano
+	  octave: 1
+          content: [4 do re mi fa 1 r
+                    8 do re mi fa sol la ti + do
+                    - 16 do re mi fa sol la ti + do - do re mi fa sol la ti + do |.]}
+         
+         {name: alto
+	  octave: 0
+          content: [1 r 4 do re mi fa
+                    8 do re mi fa sol la ti + do
+                    - 16 do re mi fa sol la ti + do - do re mi fa sol la ti + do]}
+         
+         {name: tenor
+	  octave: 0
+          content: [4 do re mi fa
+                    8 do re mi fa sol la ti + do 1 r
+                    - 16 do re mi fa sol la ti + do - do re mi fa sol la ti + do]}
+         
+         {name: bass
+	  octave: 0
+          content: [4 do re mi fa
+                    8 do re mi fa sol la ti + do 1 r
+                    - 16 do re mi fa sol la ti + do - do re mi fa sol la ti + do 1 r]}]
