@@ -38,7 +38,7 @@ for pitch in pitch_level["major"].keys():
 
 class DoremiCanvas(gtk.DrawingArea):
     """A GTK control to display a Doremi voice"""
-    def __init__(self, tune, voice, octave_offset = None):
+    def __init__(self, tune, voice, octave_offset = None, scale_factor=7):
         gtk.DrawingArea.__init__(self)
 
         partial = tune.partial
@@ -57,7 +57,8 @@ class DoremiCanvas(gtk.DrawingArea):
         self.show_all()
         self.default_gc = None
         self.y_offset = 40
-        self.vspace = 7
+        self.vspace = scale_factor
+        self.base_spacing = self.vspace * 2 + self.vspace / 7.0
         self.stem_length = self.vspace * 3
         if octave_offset:
             self.octave_offset = octave_offset
@@ -78,7 +79,7 @@ class DoremiCanvas(gtk.DrawingArea):
                 except AttributeError:
                     pass # ignore non-notes
 
-        self.sxt_space = math.ceil(15. / self.min_dur) + 1
+        self.sxt_space = math.ceil(self.base_spacing / self.min_dur) + 1
 
         self.slur_start = None
         self.tie_start = None
@@ -217,8 +218,8 @@ additional notes"""
                            7, self.y_offset + 2 * self.vspace,
                            7, self.y_offset + 6 * self.vspace)
         drawable.draw_line(gc,
-                           15, self.y_offset + 2 * self.vspace,
-                           15, self.y_offset + 6 * self.vspace)
+                           int(self.base_spacing), self.y_offset + 2 * self.vspace,
+                           int(self.base_spacing), self.y_offset + 6 * self.vspace)
 
     def draw_time(self, time):
         drawable = self.window
@@ -566,11 +567,11 @@ additional notes"""
         return x + self.sxt_space * 2
 
     def set_width(self):
-        width = sum([15 * durations[note.duration]
+        width = sum([int(self.sxt_space) * durations[note.duration]
                      for note in self.voice
                      if "duration" in dir(note)])
         
-        self.set_size_request(width + 30, 150)
+        self.set_size_request(width + 300, 155)
         
     def draw(self):
         self.set_width()
