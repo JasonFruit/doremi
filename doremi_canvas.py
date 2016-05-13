@@ -4,12 +4,15 @@ import sys
 import math
 
 # TODO: make compatible with Python 3
+if sys.version_info[0] > 2:
+    raise Exception("Not yet usable with Python 3.x.")
+
 # if sys.version_info[0] == 3:
 #     import gi
 #     gi.require_version('Gtk', '3.0')
 #     from gi.repository import Gtk as gtk
 #     from gi.repository import Gdk
-# else:    
+# else:
 import gtk
 import pango
 
@@ -46,7 +49,7 @@ for pitch in pitch_level["major"].keys():
         minor_level = level - 5
     pitch_level["minor"][pitch] = minor_level
 
-    
+
 class DoremiCanvas(gtk.DrawingArea):
     """A GTK control to display a Doremi voice"""
     def __init__(self,
@@ -76,7 +79,7 @@ class DoremiCanvas(gtk.DrawingArea):
         # the duration counter trackes the position with respect to
         # barlines
         self.dc = DurationCounter(tune.time, partial)
-        
+
         self.tune = tune
 
         # retrieve the correct voice from the tune by name
@@ -93,7 +96,7 @@ class DoremiCanvas(gtk.DrawingArea):
 
         # before the window is rendered, there is no graphics context
         self.default_gc = None
-        
+
         self.base_spacing = self.vspace * 2 + self.vspace / 7.0
         self.stem_length = self.vspace * 3
         if octave_offset:
@@ -123,7 +126,7 @@ class DoremiCanvas(gtk.DrawingArea):
         # we are neither in a slur nor a tie
         self.slur_start = None
         self.tie_start = None
-        
+
     def flags(self, duration):
         """How many flags does duration get?"""
         sixteenths = durations[duration]
@@ -135,12 +138,12 @@ class DoremiCanvas(gtk.DrawingArea):
 
     def draw_flags(self, flags, x, stem_end, stem_dir):
         """Draw a number of flags on a stem ending at stem_end and pointing in stem_dir"""
-        
+
         drawable = self.window
         gc = self.thick_gc()
 
         y_offset = 0
-        
+
         for i in range(flags):
             drawable.draw_line(gc,
                                x,
@@ -158,7 +161,7 @@ class DoremiCanvas(gtk.DrawingArea):
             drawable = self.window
             self.default_gc = drawable.new_gc(foreground=None,
                                               background=None,
-                                              font=None, 
+                                              font=None,
                                               function=-1,
                                               fill=-1,
                                               tile=None,
@@ -181,7 +184,7 @@ class DoremiCanvas(gtk.DrawingArea):
         drawable = self.window
         return drawable.new_gc(foreground=None,
                                background=None,
-                               font=None, 
+                               font=None,
                                function=-1,
                                fill=-1,
                                tile=None,
@@ -203,7 +206,7 @@ class DoremiCanvas(gtk.DrawingArea):
         drawable = self.window
         return drawable.new_gc(foreground=None,
                                background=None,
-                               font=None, 
+                               font=None,
                                function=-1,
                                fill=-1,
                                tile=None,
@@ -223,19 +226,19 @@ class DoremiCanvas(gtk.DrawingArea):
     def export(self, filename, type):
         """Export the voice as an image of type [jpeg, png, ?...] to the
         specified filename"""
-        
+
         drawable = self.window
         colormap = drawable.get_colormap()
-        
+
         pixbuf = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, 0, 8, *drawable.get_size())
         pixbuf = pixbuf.get_from_drawable(drawable, colormap, 0,0,0,0, *drawable.get_size())
-        
+
         pixbuf.save(filename, type)
 
     def draw_slur(self, direction, start, end):
         """Draw a slur facing away from the stems of a note, from (x,y) point
         start to end"""
-        
+
         drawable = self.window
         gc = self.get_gc()
 
@@ -255,12 +258,12 @@ class DoremiCanvas(gtk.DrawingArea):
             drawable.draw_arc(gc, False,
                               x1, y * direction + 3 * direction,
                               width, self.vspace,
-                              180 * 64, 180 * 64)      
+                              180 * 64, 180 * 64)
 
     def draw_staff(self):
         """Draw five lines across the control, leaving room top and bottom for
         notes on ledger lines"""
-        
+
         drawable = self.window
         gc = self.get_gc()
 
@@ -277,10 +280,10 @@ class DoremiCanvas(gtk.DrawingArea):
         """Draw a clef like that used by Jesse Aikin in his Christian Minstrel
         to indicate notes that are pitched, but only relatively
         """
-        
+
         drawable = self.window
         gc = self.xthick_gc()
-        
+
         drawable.draw_line(gc,
                            7, self.y_offset + 2 * self.vspace,
                            7, self.y_offset + 6 * self.vspace)
@@ -291,29 +294,29 @@ class DoremiCanvas(gtk.DrawingArea):
     def draw_time(self, time):
         """Draw the time signature (yes, I know it's not really a fraction,
         but are there names for the top and bottom numbers?"""
-        
+
         drawable = self.window
         gc = self.get_gc()
-        
+
         num = pango.Layout(self.get_pango_context())
         num.set_text(time.split("/")[0])
-        
+
         denom = pango.Layout(self.get_pango_context())
         denom.set_text(time.split("/")[1])
-        
+
         drawable.draw_layout(gc, 30, self.y_offset + 5, num)
         drawable.draw_layout(gc, 30, self.y_offset + 5 + self.vspace * 4, denom)
 
     def draw_ledger_lines(self, x, num):
         """Draw num ledger lines at x position; if num is negative, draw them
         above the staff"""
-        
+
         drawable = self.window
         gc = self.get_gc()
-        
+
         if num < 0:
             r = range(num - 4, 0) # 4 to start them up above the staff
-            
+
         else:
             r = range(0, num + 1) # 1 to start them below the staff
 
@@ -327,7 +330,7 @@ class DoremiCanvas(gtk.DrawingArea):
     def draw_rest(self, duration, x):
         """Draw a rest of the given duration at the given x position,
         returning the next x-position"""
-        
+
         drawable = self.window
 
         # we need all these thicknesses to draw rests
@@ -338,12 +341,12 @@ class DoremiCanvas(gtk.DrawingArea):
         x = int(x)
 
         # rests are complicated; their appearance varies without pattern based on their duration
-        
+
         if duration.startswith("4"):
 
             # quarter rests are a complicated squiggle whose varying
             # thickness is apparently important to legibility
-            
+
             drawable.draw_line(gc,
                                x - self.vspace, self.y_offset + self.vspace,
                                x, self.y_offset + self.vspace * 2)
@@ -387,7 +390,7 @@ class DoremiCanvas(gtk.DrawingArea):
             drawable.draw_line(xtgc,
                                x - 10, self.y_offset + self.vspace * 3 - 3,
                                x + 10, self.y_offset + self.vspace * 3 - 3)
-            
+
         else:
             #TODO: implement eighth and sixteenth rests
             raise Exception("Rests of duration %s not implemented." % duration)
@@ -407,7 +410,7 @@ class DoremiCanvas(gtk.DrawingArea):
 
         # return the next x position
         return x + space_after
-            
+
 
     def draw_note(self, note_obj, key, x):
         """Draw a note of a given scale degree, duration, etc. returning the
@@ -491,8 +494,8 @@ class DoremiCanvas(gtk.DrawingArea):
                                    stem_end)
 
                 self.draw_flags(self.flags(duration), x, stem_end, stem_dir)
-                    
-            
+
+
         elif note.startswith("r"):
             drawable.draw_arc(gc,
                               filled,
@@ -515,10 +518,10 @@ class DoremiCanvas(gtk.DrawingArea):
                     y_offset = 6
                 else:
                     y_offset = 3
-                    
+
                 stem_start = y + y_offset * stem_dir
                 stem_end = stem_start + self.stem_length * stem_dir
-                
+
                 drawable.draw_line(gc,
                                    x,
                                    stem_start,
@@ -526,7 +529,7 @@ class DoremiCanvas(gtk.DrawingArea):
                                    stem_end)
 
                 self.draw_flags(self.flags(duration), x, stem_end, stem_dir)
-            
+
         elif note.startswith("m"):
             drawable.draw_polygon(gc, filled, [(x - self.vspace, y),
                                                (x, y - self.vspace),
@@ -541,7 +544,7 @@ class DoremiCanvas(gtk.DrawingArea):
                                    stem_end)
 
                 self.draw_flags(self.flags(duration), x, stem_end, stem_dir)
-            
+
         elif note.startswith("f"):
             drawable.draw_polygon(gc, filled, [(x - self.vspace, y - self.vspace),
                                                (x - self.vspace, y + self.vspace),
@@ -564,7 +567,7 @@ class DoremiCanvas(gtk.DrawingArea):
                                        x - self.vspace,
                                        stem_end)
                 self.draw_flags(self.flags(duration), stem_x, stem_end, stem_dir)
-                    
+
         elif note.startswith("s"):
             drawable.draw_arc(gc,
                               filled,
@@ -582,7 +585,7 @@ class DoremiCanvas(gtk.DrawingArea):
                                    x,
                                    stem_end)
                 self.draw_flags(self.flags(duration), x, stem_end, stem_dir)
-            
+
         elif note.startswith("l"):
             drawable.draw_rectangle(gc,
                                     filled,
@@ -594,14 +597,14 @@ class DoremiCanvas(gtk.DrawingArea):
             if has_stem:
                 stem_x = x - self.vspace * stem_dir
                 stem_end = y + self.vspace * stem_dir + self.stem_length * stem_dir
-                
+
                 drawable.draw_line(gc,
                                    stem_x,
                                    y + self.vspace * stem_dir - stem_dir,
                                    stem_x,
                                    stem_end)
                 self.draw_flags(self.flags(duration), stem_x, stem_end, stem_dir)
-            
+
         elif note.startswith("t"):
             drawable.draw_arc(gc,
                               filled,
@@ -650,7 +653,7 @@ class DoremiCanvas(gtk.DrawingArea):
             ledger_lines = 0 - int(math.ceil((self.y_offset - y) / (self.vspace * 2)))
         else:
             ledger_lines = 0
-            
+
         self.draw_ledger_lines(x, ledger_lines)
 
         # track the note's duration
@@ -666,8 +669,6 @@ class DoremiCanvas(gtk.DrawingArea):
         draw a regular barline; if "|.", draw a final barline; if "||", a thin
         double bar."""
 
-        # TODO: implement repeat barlines
-        
         gc = self.get_gc()
         tgc = self.thick_gc()
         xtgc = self.xthick_gc()
@@ -682,35 +683,63 @@ class DoremiCanvas(gtk.DrawingArea):
                                int(x) + 4, self.y_offset,
                                int(x) + 4, self.bottom_line)
 
-        if style == "||":
+        elif style == "||":
             drawable.draw_line(gc,
                                int(x) + 4, self.y_offset,
                                int(x) + 4, self.bottom_line)
+
+        elif style == "|:":
+            drawable.draw_line(tgc,
+                               int(x) - 4, self.y_offset,
+                               int(x) - 4, self.bottom_line)
+
+            drawable.draw_arc(gc, True,
+                              int(x + self.vspace / 2), int(self.y_offset + self.vspace * 3),
+                              5, 5,
+                              0, 360 * 64)
+            drawable.draw_arc(gc, True,
+                              int(x + self.vspace / 2), int(self.y_offset + self.vspace * 5),
+                              5, 5,
+                              0, 360 * 64)
+            x += self.sxt_space
+        elif style == ":|":
+            drawable.draw_line(tgc,
+                               int(x) + 4, self.y_offset,
+                               int(x) + 4, self.bottom_line)
+
+            drawable.draw_arc(gc, True,
+                              int(x - self.vspace), int(self.y_offset + self.vspace * 3),
+                              5, 5,
+                              0, 360 * 64)
+            drawable.draw_arc(gc, True,
+                              int(x - self.vspace), int(self.y_offset + self.vspace * 5),
+                              5, 5,
+                              0, 360 * 64)
 
         return x + self.sxt_space * 2
 
     def set_width(self):
         """Set the width of the control to fit complete voice"""
-        
+
         width = sum([int(self.sxt_space) * durations[note.duration]
                      for note in self.voice
                      if "duration" in dir(note)])
-        
+
         self.set_size_request(width + 300, 155)
-        
+
     def draw(self):
         """Draw the voice and horizontally resize the control accordingly"""
-        
+
         self.set_width()
-        
+
         self.draw_staff()
-        
+
         self.draw_clef()
         self.draw_time(self.tune.time)
 
         # allow enough room for the clef and time signature
         x = self.vspace * 9
-        
+
         for note in self.voice:
             if type(note) == RepeatMarker: # special barlines
                 x = self.draw_barline(x, note.text)
@@ -720,7 +749,7 @@ class DoremiCanvas(gtk.DrawingArea):
                 x = self.draw_note(note,
                                    self.tune.key.split(" ")[1],
                                    x)
-                
+
             else:
                 pass #TODO: handle other non-notes
 
@@ -733,7 +762,7 @@ if __name__ == "__main__":
     win = gtk.Window()
     win.set_title("Test Window")
     win.connect("destroy", gtk.main_quit)
-    
+
     vbx = gtk.VBox()
     win.add(vbx)
 
@@ -745,19 +774,19 @@ if __name__ == "__main__":
     voice_vbx = gtk.VBox()
 
     canvases = []
-    
+
     for voice in tune:
         dc = DoremiCanvas(tune, voice.name)
         canvases.append(dc)
         voice_vbx.pack_start(dc, False)
-        
+
     scroll.add_with_viewport(voice_vbx)
     vbx.pack_start(scroll, True, True, 0)
 
     def exportem(*args, **kwargs):
         for canvas in canvases:
             canvas.export("%s-%s.jpg" % (tune.title, canvas.voice.name), "jpeg")
-            
+
     btn = gtk.Button("Apply Whatever")
     btn.connect("clicked", exportem)
     vbx.pack_end(btn, False)

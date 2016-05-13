@@ -6,7 +6,7 @@ partial: 0
 voices: [{name: treble
 	  octave: 0
           content: [1 mi 4. slur mi 8 slur re 4 mi mi 2 fa mi 2. mi
-                    4 do sol sol sol 8 slur mi fa 2. mi 4 r 1 r 2. r
+                    4 do sol sol sol 8 slur mi fa 2. mi |: 4 r 1 r 2. r
                     8 slur do re slur mi re slur do ti 4 la 8 slur do re 4 mi + la - mi
                     8 slur do re 4 mi mi mi + la - sol sol sol
                     8 slur do re 4 mi + la - sol 8 slur mi re 2. mi 4 r 1 mi]}
@@ -15,7 +15,7 @@ voices: [{name: treble
 	  octave: 0
           content: [1 do 4. slur la - 8 slur sol + 4 la ti 2 la - sol + 2. la
                     4 la ti ti ti 8 slur do ti 2. la
-                    4 r 1 r r 2. r 8 slur do re slur mi re slur do ti 4 la la - 2 sol + do 2. ti
+                    |: 4 r 1 r r 2. r 8 slur do re slur mi re slur do ti 4 la la - 2 sol + do 2. ti
                     8 slur do ti 4 la la - sol sol + 2. la 4 r 1 la]}
          
          {name: lead
@@ -30,6 +30,6 @@ voices: [{name: treble
 	  octave: -1
           content: [1 la 4. slur la slur 8 ti 4 do do 2 re mi 2. la
                     4 do - sol sol sol 8 slur + la - sol 2. mi
-                    + 8 slur do re slur mi re slur do ti 4 la la - mi mi + 2 tie la 1 tie la 2. la
+                    |: + 8 slur do re slur mi re slur do ti 4 la la - mi mi + 2 tie la 1 tie la 2. la
                     4 mi do do do la - mi mi mi
                     4 sol + la do - mi mi + 2. la 4 r 1 la ]}]
