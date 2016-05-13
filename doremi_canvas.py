@@ -4,7 +4,7 @@ import sys
 import math
 
 # TODO: make compatible with Python 3
-if sys.version_info[0] > 2:
+if sys.version_info[0] == 3:
     raise Exception("Not yet usable with Python 3.x.")
 
 # if sys.version_info[0] == 3:
@@ -87,8 +87,8 @@ class DoremiCanvas(gtk.DrawingArea):
                       for v in tune
                       if v.name == voice][0]
 
-        self.cursor_pos = self.voice[0]
-        self.active = False
+        self.active_item = self.voice[0]
+        self.focus = False
 
         self.y_offset = 40 # the distance from the top of the control
                            # to the top line of the staff
@@ -123,15 +123,16 @@ class DoremiCanvas(gtk.DrawingArea):
                 except AttributeError:
                     pass # ignore non-notes
 
-        # set the sixteenth-note space to make the minimum duration a sensible minimum space
+        # set the sixteenth-note space to make the minimum duration a
+        # sensible minimum space
         self.sxt_space = math.ceil(self.base_spacing / self.min_dur) + 1
 
         # we are neither in a slur nor a tie
         self.slur_start = None
         self.tie_start = None
 
-    def toggle_active(self):
-        self.active = not self.active
+    def toggle_focus(self):
+        self.focus = not self.focus
 
     def flags(self, duration):
         """How many flags does duration get?"""
@@ -149,8 +150,10 @@ class DoremiCanvas(gtk.DrawingArea):
         drawable = self.window
         colormap = drawable.get_colormap()
 
-        pixbuf = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, 0, 8, *drawable.get_size())
-        pixbuf = pixbuf.get_from_drawable(drawable, colormap, 0,0,0,0, *drawable.get_size())
+        pixbuf = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, 0, 8,
+                                *drawable.get_size())
+        pixbuf = pixbuf.get_from_drawable(drawable, colormap, 0,0,0,0,
+                                          *drawable.get_size())
 
         pixbuf.save(filename, type)
 
@@ -236,11 +239,11 @@ class DoremiCanvas(gtk.DrawingArea):
 
     def draw_cursor(self, x):
         drawable = self.window
-        gc = self.thick_gc(color=self.active and "red" or "#FFCCCC")
+        gc = self.thick_gc(color=self.focus and "red" or "#FFCCCC")
         drawable.draw_line(gc,
-                           x + int(self.sxt_space),
+                           int(x + self.sxt_space),
                            self.y_offset, 
-                           x + int(self.sxt_space),
+                           int(x + self.sxt_space),
                            self.bottom_line)
 
     def draw_staff(self):
@@ -271,8 +274,10 @@ class DoremiCanvas(gtk.DrawingArea):
                            7, self.y_offset + 2 * self.vspace,
                            7, self.y_offset + 6 * self.vspace)
         drawable.draw_line(gc,
-                           int(self.base_spacing), self.y_offset + 2 * self.vspace,
-                           int(self.base_spacing), self.y_offset + 6 * self.vspace)
+                           int(self.base_spacing),
+                           self.y_offset + 2 * self.vspace,
+                           int(self.base_spacing),
+                           self.y_offset + 6 * self.vspace)
 
     def draw_time(self, time):
         """Draw the time signature (yes, I know it's not really a fraction,
@@ -380,7 +385,9 @@ class DoremiCanvas(gtk.DrawingArea):
 
         # extract pitch, duration, and octave information from the
         # note object
-        note, duration, octave = note_obj.pitch, note_obj.duration, note_obj.octave
+        note, duration, octave = (note_obj.pitch,
+                                  note_obj.duration,
+                                  note_obj.octave)
 
         # if the note is a rest (Doremi notes and rests have the same
         # representation), return the result of drawing the rest
@@ -764,7 +771,7 @@ class DoremiCanvas(gtk.DrawingArea):
         x = self.vspace * 9
 
         for note in self.voice:
-            if note is self.cursor_pos:
+            if note is self.active_item:
                 self.draw_cursor(x)
 
             if type(note) == RepeatMarker: # special barlines
@@ -779,6 +786,32 @@ class DoremiCanvas(gtk.DrawingArea):
 
             else:
                 pass #TODO: handle other non-notes
+
+    def active_index(self):
+        return self.voice.index(self.active_item)
+    def delete_note(self):
+        index = self.active_index()
+        self.voice.remove(self.active_item)
+        if index == 0:
+            self.active_item = self.voice[0]
+        else:
+            self.active_item = self.voice[index - 1]
+
+        try:
+            self.draw()
+        except AttributeError:
+            pass
+
+    def insert_note(self,
+                    note):
+        index = self.active_index() + 1
+        self.voice.insert(index, note)
+        self.active_item = note
+        
+        try:
+            self.draw()
+        except AttributeError:
+            pass
 
     def redraw_event_handler(self, btn, *args):
         self.draw()
@@ -807,7 +840,12 @@ if __name__ == "__main__":
         canvases.append(dc)
         voice_vbx.pack_start(dc, False)
 
-    canvases[2].toggle_active()
+    canvases[2].toggle_focus()
+
+    canvases[2].insert_note(Note("mi",
+                                 "2",
+                                 0))
+    # canvases[2].delete_note()
     
     scroll.add_with_viewport(voice_vbx)
     vbx.pack_start(scroll, True, True, 0)
