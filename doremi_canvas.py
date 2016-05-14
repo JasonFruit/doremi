@@ -87,8 +87,9 @@ class DoremiCanvas(gtk.DrawingArea):
                       for v in tune
                       if v.name == voice][0]
 
-        self.active_item = self.voice[0]
+        self._active_item = self.voice[0]
         self.focus = False
+        self.cursor_x = 0 # we don't know where the cursor will fall yet
 
         self.y_offset = 40 # the distance from the top of the control
                            # to the top line of the staff
@@ -106,26 +107,6 @@ class DoremiCanvas(gtk.DrawingArea):
             self.octave_offset = octave_offset
         else:
             self.octave_offset = 0 - self.voice.octave
-
-        # determine the shortest note (min_dur) in the tune
-
-        # start assuming a really long minimum duration
-        self.min_dur = 24
-
-        # find the shortest note duration in the entire tune, not just
-        # this voice
-        for v in tune:
-            for note in v:
-                try:
-                    dur = durations[note.duration]
-                    if dur < self.min_dur:
-                        self.min_dur = dur
-                except AttributeError:
-                    pass # ignore non-notes
-
-        # set the sixteenth-note space to make the minimum duration a
-        # sensible minimum space
-        self.sxt_space = math.ceil(self.base_spacing / self.min_dur) + 1
 
         # we are neither in a slur nor a tie
         self.slur_start = None
@@ -184,6 +165,31 @@ class DoremiCanvas(gtk.DrawingArea):
                                cap_style=-1,
                                join_style=-1)
 
+    def clear_gc(self):
+        """Get a basic graphic context"""
+        drawable = self.window
+        map = drawable.get_colormap()
+        white = map.alloc("#FFFFFF")
+            
+        return drawable.new_gc(foreground=white,
+                               background=None,
+                               font=None,
+                               function=-1,
+                               fill=-1,
+                               tile=None,
+                               stipple=None,
+                               clip_mask=None,
+                               subwindow_mode=-1,
+                               ts_x_origin=-1,
+                               ts_y_origin=-1,
+                               clip_x_origin=-1,
+                               clip_y_origin=-1,
+                               graphics_exposures=-1,
+                               line_width=-1,
+                               line_style=-1,
+                               cap_style=-1,
+                               join_style=-1)
+    
     def thick_gc(self, color=None):
         """Get a thick-line graphic context"""
         drawable = self.window
@@ -760,6 +766,35 @@ class DoremiCanvas(gtk.DrawingArea):
     def draw(self):
         """Draw the voice and horizontally resize the control accordingly"""
 
+        # determine the shortest note (min_dur) in the tune (redo every time since the tune may change between drawings
+
+        # start assuming an unlikely long minimum duration
+        self.min_dur = 24
+
+        # find the shortest note duration in the entire tune, not just
+        # this voice
+        for v in self.tune:
+            for note in v:
+                try:
+                    dur = durations[note.duration]
+                    if dur < self.min_dur:
+                        self.min_dur = dur
+                except AttributeError:
+                    pass # ignore non-notes
+
+        # set the sixteenth-note space to make the minimum duration a
+        # sensible minimum space
+        self.sxt_space = math.ceil(self.base_spacing / self.min_dur) + 1
+
+        drawable = self.window
+        width, height = self.get_size_request()
+        drawable.draw_rectangle(self.clear_gc(), True, 0, 0,
+                                width, height)
+        
+        region = drawable.get_update_area()
+        if region:
+            drawable.invalidate_region(region, False)
+        
         self.set_width()
 
         self.draw_staff()
@@ -771,8 +806,9 @@ class DoremiCanvas(gtk.DrawingArea):
         x = self.vspace * 9
 
         for note in self.voice:
-            if note is self.active_item:
+            if note is self.active_item():
                 self.draw_cursor(x)
+                self.cursor_x = x
 
             if type(note) == RepeatMarker: # special barlines
                 x = self.draw_barline(x, note.text)
@@ -787,15 +823,19 @@ class DoremiCanvas(gtk.DrawingArea):
             else:
                 pass #TODO: handle other non-notes
 
+    def active_item(self):
+        return self._active_item
+            
     def active_index(self):
-        return self.voice.index(self.active_item)
+        return self.voice.index(self.active_item())
+    
     def delete_note(self):
         index = self.active_index()
-        self.voice.remove(self.active_item)
+        self.voice.remove(self.active_item())
         if index == 0:
-            self.active_item = self.voice[0]
+            self._active_item = self.voice[0]
         else:
-            self.active_item = self.voice[index - 1]
+            self._active_item = self.voice[index - 1]
 
         try:
             self.draw()
@@ -806,12 +846,40 @@ class DoremiCanvas(gtk.DrawingArea):
                     note):
         index = self.active_index() + 1
         self.voice.insert(index, note)
-        self.active_item = note
+        self._active_item = note
         
         try:
             self.draw()
         except AttributeError:
             pass
+
+    def change_pitch(self, new_pitch):
+        try:
+            self.active_item().pitch = new_pitch
+        except:
+            raise Exception("Item at cursor is unpitched.")
+
+        try:
+            self.draw()
+        except AttributeError:
+            pass
+
+    def move_prev(self):
+        index = self.active_index()
+        if index > 0:
+            self._active_item = self.voice[index - 1]
+
+        try:
+            self.draw()
+        except AttributeError:
+            pass
+
+    def move_next(self):
+        index = self.active_index()
+        if index < len(self.voice) - 1:
+            self._active_item = self.voice[index + 1]
+
+        self.draw()
 
     def redraw_event_handler(self, btn, *args):
         self.draw()
@@ -841,22 +909,22 @@ if __name__ == "__main__":
         voice_vbx.pack_start(dc, False)
 
     canvases[2].toggle_focus()
-
-    canvases[2].insert_note(Note("mi",
-                                 "2",
-                                 0))
-    # canvases[2].delete_note()
     
     scroll.add_with_viewport(voice_vbx)
     vbx.pack_start(scroll, True, True, 0)
 
-    def exportem(*args, **kwargs):
-        for canvas in canvases:
-            canvas.export("%s-%s.jpg" % (tune.title, canvas.voice.name), "jpeg")
+    def next(*args, **kwargs):
+        canvases[2].move_next()
 
-    btn = gtk.Button("Apply Whatever")
-    btn.connect("clicked", exportem)
+    def prev(*args, **kwargs):
+        canvases[2].move_prev()
+
+    btn = gtk.Button("Prev")
+    btn.connect("clicked", prev)
     vbx.pack_end(btn, False)
+    btn2 = gtk.Button("Next")
+    btn2.connect("clicked", next)
+    vbx.pack_end(btn2, False)
     win.show_all()
     win.maximize()
     gtk.main()
