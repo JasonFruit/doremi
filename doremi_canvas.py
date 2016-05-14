@@ -91,8 +91,9 @@ class DoremiCanvas(gtk.DrawingArea):
         self.focus = False
         self.cursor_x = 0 # we don't know where the cursor will fall yet
 
-        self.y_offset = 40 # the distance from the top of the control
-                           # to the top line of the staff
+        # set the distance from the top of the control to the top line
+        # of the staff
+        self.y_offset = int((155. - 9. * scale_factor) / 2.)
 
         # we have to set _some_ size to display correctly
         self.set_size_request(0, 150)
@@ -247,9 +248,9 @@ class DoremiCanvas(gtk.DrawingArea):
         drawable = self.window
         gc = self.thick_gc(color=self.focus and "red" or "#FFCCCC")
         drawable.draw_line(gc,
-                           int(x + self.sxt_space),
+                           int(x),
                            self.y_offset, 
-                           int(x + self.sxt_space),
+                           int(x),
                            self.bottom_line)
 
     def draw_staff(self):
@@ -766,6 +767,9 @@ class DoremiCanvas(gtk.DrawingArea):
     def draw(self):
         """Draw the voice and horizontally resize the control accordingly"""
 
+        # reset the duration counter
+        self.dc.reset()
+        
         # determine the shortest note (min_dur) in the tune (redo every time since the tune may change between drawings
 
         # start assuming an unlikely long minimum duration
@@ -806,15 +810,16 @@ class DoremiCanvas(gtk.DrawingArea):
         x = self.vspace * 9
 
         for note in self.voice:
-            if note is self.active_item():
-                self.draw_cursor(x)
-                self.cursor_x = x
 
             if type(note) == RepeatMarker: # special barlines
                 x = self.draw_barline(x, note.text)
             elif self.dc.at_barline(): # regular barlines
                 x = self.draw_barline(x)
-                
+
+            if note is self.active_item():
+                self.draw_cursor(x)
+                self.cursor_x = x
+    
             if type(note) == Note: # notes and rests
                 x = self.draw_note(note,
                                    self.tune.key.split(" ")[1],

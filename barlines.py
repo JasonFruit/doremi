@@ -18,8 +18,12 @@ def measure_duration(time_sig):
 
 class DurationCounter(object):
     def __init__(self, time_sig, partial):
+        self.time_sig = time_sig
+        self.partial = partial
         self.measure_dur = measure_duration(time_sig)
-        self.cur = self.measure_dur - durations[partial]
+        self.cur = self.measure_dur - durations[self.partial]
+    def reset(self):
+        self.cur = self.measure_dur - durations[self.partial]
     def at_barline(self):
         return (self.cur % self.measure_dur) == 0
     def count(self, dur):
