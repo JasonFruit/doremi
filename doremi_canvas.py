@@ -246,7 +246,7 @@ class DoremiCanvas(gtk.DrawingArea):
 
     def draw_cursor(self, x):
         drawable = self.window
-        gc = self.thick_gc(color=self.focus and "red" or "#FFCCCC")
+        gc = self.thick_gc(color=self.focus and "blue" or "#CCCCFF")
         drawable.draw_line(gc,
                            int(x),
                            self.y_offset, 

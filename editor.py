@@ -16,11 +16,11 @@ chromatics = {"do": (None, "di"),
               "la": ("le", "li"),
               "ti": ("te", None)}
 
-durations = [u"\U0001D15D",
-             u"\U0001D15E",
-             u"\U0001D15F",
-             u"\U0001D160",
-             u"\U0001D161"]
+durations = [("1", u"\U0001D15D"),
+             ("2", u"\U0001D15E"),
+             ("4", u"\U0001D15F"),
+             ("8", u"\U0001D160"),
+             ("16", u"\U0001D161")]
 
 barlines = [u"\U0001D106",
             u"\U0001D107",
@@ -79,147 +79,184 @@ class MainWindow(gtk.Window):
     def focused_canvas(self):
         return [c for c in self.canvases
                 if c.focus][0]
+
+    def prev_voice(self):
+        for i in range(len(self.canvases)):
+            c = self.canvases[i]
+            if c.focus:
+                c.toggle_focus()
+                self.canvases[i - 1].toggle_focus()
+                self.redraw()
+                break
+
+    def next_voice(self):
+        for i in range(len(self.canvases)):
+            c = self.canvases[i]
+            if c.focus:
+                c.toggle_focus()
+                if i < len(self.canvases) - 1:
+                    self.canvases[i + 1].toggle_focus()
+                else:
+                    self.canvases[0].toggle_focus()
+                self.redraw()
+                break
+
+    def make_note(self, pitch="r"):
+        index = self.focused_canvas().active_index()
+
+        # use the octave of the most recent note, otherwise default to 0
+        while True:
+            try:
+                octave = self.focused_canvas().voice[index].octave
+                break
+            except AttributeError:
+                index -= 1
+            except IndexError:
+                octave = 0
+                break
+                    
+        return Note(pitch=pitch,
+                    duration=self.duration,
+                    octave=octave)
+
+    def up_octave(self):
+        try:
+            o = self.focused_canvas().active_item().octave
+            self.focused_canvas().active_item().octave += 1
+            self.focused_canvas().draw()
+        except AttributeError, ValueError:
+            pass
+
+    def down_octave(self):
+        try:
+            o = self.focused_canvas().active_item().octave
+            self.focused_canvas().active_item().octave -= 1
+            self.focused_canvas().draw()
+        except AttributeError, ValueError:
+            pass
+
+    def tie(self):
+        try:
+            item = self.focused_canvas().active_item()
+            
+            if "tie" in item.modifiers:
+                item.modifiers.remove("tie")
+            else:
+                item.modifiers.append("tie")
+                
+            self.focused_canvas().draw()
+        except AttributeError, ValueError:
+            pass
+
+    def toggle_slur(self):
+        try:
+            item = self.focused_canvas().active_item()
+            voice = self.focused_canvas().voice
+            next_index = self.focused_canvas().active_index() + 1
+            next = voice[next_index]
+
+            if "slur" in item.modifiers:
+
+                item.modifiers.remove("slur")
+
+                for note in voice[next_index:]:
+                    try:
+                        if "slur" in note.modifiers:
+                            break
+                        elif "end slur" in note.modifiers:
+                            note.modifiers.remove("end slur")
+                            break
+                    except: # we should keep on no matter what
+                        pass
+
+            else:
+                item.modifiers.append("slur")
+
+            self.focused_canvas().draw()
+
+        except AttributeError, ValueError:
+            pass
+
+    def toggle_end_slur(self):
+        try:
+            item = self.focused_canvas().active_item()
+            voice = self.focused_canvas().voice
+            next = voice[self.focused_canvas().active_index() + 1]
+
+            if "end slur" in item.modifiers:
+                item.modifiers.remove("end slur")
+            else:
+                item.modifiers.append("end slur")
+
+            self.focused_canvas().draw()
+        except AttributeError, ValueError:
+            pass
+
+    def toggle_dot(self):
+        try:
+            item = self.focused_canvas().active_item()
+            if item.duration[-1] == ".":
+                item.duration = item.duration.replace(".", "")
+            else:
+                item.duration = "%s." % item.duration
+            self.focused_canvas().draw()
+        except AttributeError, ValueError:
+            pass
     
     def keypress_handler(self, w, e):
         try:
             v = gtk.gdk.keyval_name(e.keyval)
         except ValueError:
-            return
+            return False
 
         if v == "Up":
-            for i in range(len(self.canvases)):
-                c = self.canvases[i]
-                if c.focus:
-                    c.toggle_focus()
-                    self.canvases[i - 1].toggle_focus()
-                    self.redraw()
-                    break
+            self.prev_voice()
         elif v == "Down":
-            for i in range(len(self.canvases)):
-                c = self.canvases[i]
-                if c.focus:
-                    c.toggle_focus()
-                    if i < len(self.canvases) - 1:
-                        self.canvases[i + 1].toggle_focus()
-                    else:
-                        self.canvases[0].toggle_focus()
-                    self.redraw()
-                    break
+            self.next_voice()
         elif v == "Left":
             self.focused_canvas().move_prev()
         elif v == "Right":
             self.focused_canvas().move_next()
+        elif v == "Delete":
+            self.focused_canvas().delete_note()
         elif v == "BackSpace":
+            self.focused_canvas().move_prev()
             self.focused_canvas().delete_note()
         elif v in "drmfslt":
-            if v == "s":
-                # C-s saves the file
-                if e.state == gtk.gdk.CONTROL_MASK:
-                    # TODO: make this output Doremi code to a file
-                    self.save_file()
-            index = self.focused_canvas().active_index()
-
-            # use the octave of the most recent note, otherwise default to 0
-            while True:
-                try:
-                    octave = self.focused_canvas().voice[index].octave
-                    break
-                except AttributeError:
-                    index -= 1
-                except IndexError:
-                    octave = 0
-                    break
-                    
-            note = Note(pitch=[note for note in notes
-                               if note[0] == v][0],
-                        duration=self.duration,
-                        octave=octave)
-            self.focused_canvas().insert_note(note)
-            self.redraw()
+            # C-s saves the file
+            if v == "s" and e.state == gtk.gdk.CONTROL_MASK:
+                # TODO: make this output Doremi code to a file
+                self.save_file()
+            else:
+                pitch=[note for note in notes
+                           if note[0] == v][0]
+                self.focused_canvas().insert_note(self.make_note(pitch))
         elif v == "x":
-            note = Note(pitch="r",
-                        duration=self.duration,
-                        octave=None)
-            self.focused_canvas().insert_note(note)
-            self.redraw()
+            self.focused_canvas().insert_note(self.make_note())
         elif v in "12486":
             if v == "6":
                 self.duration = "16"
             else:
                 self.duration = v
         elif v == "plus":
-            try:
-                o = self.focused_canvas().active_item().octave
-                self.focused_canvas().active_item().octave += 1
-                self.focused_canvas().draw()
-            except AttributeError, ValueError:
-                pass
+            self.up_octave()
         elif v == "minus":
-            try:
-                o = self.focused_canvas().active_item().octave
-                self.focused_canvas().active_item().octave -= 1
-                self.focused_canvas().draw()
-            except AttributeError, ValueError:
-                pass
+            self.down_octave()
         elif v == "underscore":
             pass # TODO: flatten
         elif v == "comma":
-            try:
-                item = self.focused_canvas().active_item()
-                
-                if "tie" in item.modifiers:
-                    item.modifiers.remove("tie")
-                else:
-                    item.modifiers.append("tie")
-                    
-                self.focused_canvas().draw()
-            except AttributeError, ValueError:
-                pass
+            self.tie()
         elif v == "parenleft":
-            try:
-                item = self.focused_canvas().active_item()
-                voice = self.focused_canvas().voice
-                next_index = self.focused_canvas().active_index() + 1
-                next = voice[next_index]
-
-                if "slur" in item.modifiers:
-                    
-                    item.modifiers.remove("slur")
-                    
-                    for note in voice[next_index:]:
-                        try:
-                            if "slur" in note.modifiers:
-                                break
-                            elif "end slur" in note.modifiers:
-                                note.modifiers.remove("end slur")
-                                break
-                        except: # we should keep on no matter what
-                            pass
-                            
-                else:
-                    item.modifiers.append("slur")
-                
-                self.focused_canvas().draw()
-                
-            except AttributeError, ValueError:
-                pass
+            self.toggle_slur()
         elif v == "parenright":
-            try:
-                item = self.focused_canvas().active_item()
-                voice = self.focused_canvas().voice
-                next = voice[self.focused_canvas().active_index() + 1]
-
-                if "end slur" in item.modifiers:
-                    item.modifiers.remove("end slur")
-                else:
-                    item.modifiers.append("end slur")
-                    
-                self.focused_canvas().draw()
-            except AttributeError, ValueError:
-                pass
-                
+            self.toggle_end_slur()
+        elif v == "period":
+            self.toggle_dot()
         else:
             print(v)
+            return False
+
+        return True
                 
     def build_notation_bar(self):
         
@@ -234,7 +271,8 @@ class MainWindow(gtk.Window):
         notation_buttons.pack_start(sep, False)
         
         for duration in durations:
-            btn = gtk.Button(duration)
+            btn = gtk.Button(duration[1])
+            btn.duration = duration[0]
             lbl = btn.child
             lbl.modify_font(pango.FontDescription("24"))
             btn.set_size_request(50, 50)
