@@ -245,7 +245,37 @@ class MainWindow(gtk.Window):
             
         except AttributeError, ValueError: # not a note
             pass
-    
+
+    def sharp_note(self):
+        note = self.focused_canvas().active_item()
+        try:
+            if note.pitch in notes:
+                new_pitch = chromatics[note.pitch][1]
+                if new_pitch:
+                    note.pitch = new_pitch
+            else:
+                for n in notes:
+                    if note.pitch in chromatics[n]:
+                        note.pitch = n
+            self.focused_canvas().draw()
+        except AttributeError, ValueError:
+            pass
+
+    def flat_note(self):
+        note = self.focused_canvas().active_item()
+        try:
+            if note.pitch in notes:
+                new_pitch = chromatics[note.pitch][0]
+                if new_pitch:
+                    note.pitch = new_pitch
+            else:
+                for n in notes:
+                    if note.pitch in chromatics[n]:
+                        note.pitch = n
+            self.focused_canvas().draw()
+        except AttributeError, ValueError:
+            pass
+        
     def keypress_handler(self, w, e):
         """Handle keyboard events"""
         
@@ -268,11 +298,10 @@ class MainWindow(gtk.Window):
             self.focused_canvas().move_prev()
             self.focused_canvas().delete_note()
         elif v in "drmfslt": # the note events
-            # C-s saves the file
+            # if Ctrl is pressed, s saves the file
             if v == "s" and e.state == gtk.gdk.CONTROL_MASK:
-                # TODO: make this output Doremi code to a file
                 self.save_file()
-            else:
+            else: # otherwise add a note
                 pitch=[note for note in notes
                            if note[0] == v][0]
                 self.focused_canvas().insert_note(self.make_note(pitch))
@@ -288,7 +317,9 @@ class MainWindow(gtk.Window):
         elif v == "minus": # transpose down octave
             self.down_octave()
         elif v == "underscore":
-            pass # TODO: flatten
+            self.flat_note()
+        elif v == "numbersign":
+            self.sharp_note()
         elif v == "comma": # tie
             self.tie()
         elif v == "parenleft": # start slur

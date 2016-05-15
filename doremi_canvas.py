@@ -20,6 +20,14 @@ import pango
 from doremi.doremi_parser import Note, RepeatMarker
 from barlines import DurationCounter, durations
 
+chromatics = {"do": (None, "di"),
+              "re": ("ra", "ri"),
+              "mi": ("me", None),
+              "fa": (None, "fi"),
+              "sol": ("se", "si"),
+              "la": ("le", "li"),
+              "ti": ("te", None)}
+
 # the scale degree number for each syllable in major
 pitch_level = {"major": {"do": 0,
                          "di": 0,
@@ -386,6 +394,41 @@ class DoremiCanvas(gtk.DrawingArea):
         # return the next x position
         return x + space_after
 
+    def draw_sharp(self, x, y):
+        """Draw a sharp at a position suitable for a note at (x,y)"""
+
+        x -= int(self.vspace / 2)
+        drawable = self.window
+        gc = self.get_gc()
+        drawable.draw_line(gc,
+                           x - self.vspace, y - self.vspace,
+                           x - self.vspace - 2, y + self.vspace)
+        drawable.draw_line(gc,
+                           x - self.vspace - 2, y - self.vspace,
+                           x - self.vspace - 5, y + self.vspace)
+        drawable.draw_line(gc,
+                           x - self.vspace * 2, y - 1,
+                           x, y - 1)
+        drawable.draw_line(gc,
+                           x - self.vspace * 2, y + 1,
+                           x, y + 1)
+
+    def draw_flat(self, x, y):
+        drawable = self.window
+        gc = self.get_gc()
+
+        x -= self.vspace * 2
+
+        drawable.draw_line(gc,
+                           x, y - self.vspace,
+                           x, y + self.vspace)
+        drawable.draw_line(gc,
+                           x, y + self.vspace,
+                           x + 3, y + self.vspace - 3)
+        drawable.draw_line(gc,
+                           x + 3, y + self.vspace - 3,
+                           x, y + self.vspace - 6)
+
     def draw_note(self, note_obj, key, x):
         """Draw a note of a given scale degree, duration, etc. returning the
         next x position"""
@@ -609,6 +652,13 @@ class DoremiCanvas(gtk.DrawingArea):
                                    stem_end)
                 self.draw_flags(self.flags(duration), x, stem_end, stem_dir)
 
+        if note in [chromatics[k][1]
+                    for k in chromatics.keys()]:
+            self.draw_sharp(x, y)
+        elif note in [chromatics[k][0]
+                    for k in chromatics.keys()]:
+            self.draw_flat(x, y)
+                
         # draw a dot, above and to the right for do, mi, fa, sol, and la
         if dotted:
             if note[0] in "dmfsl":
@@ -788,7 +838,7 @@ class DoremiCanvas(gtk.DrawingArea):
 
         # set the sixteenth-note space to make the minimum duration a
         # sensible minimum space
-        self.sxt_space = math.ceil(self.base_spacing / self.min_dur) + 1
+        self.sxt_space = math.ceil(self.base_spacing / self.min_dur) + 5
 
         drawable = self.window
         width, height = self.get_size_request()
