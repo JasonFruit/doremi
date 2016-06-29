@@ -65,3 +65,6 @@ target/
 *.aux
 *.log
 *.toc
+
+# temp directory
+tmp/
