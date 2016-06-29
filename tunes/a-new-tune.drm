@@ -1,0 +1,32 @@
+title: "Stanley"
+composer: "Jason R. Fruit"
+key: C major
+time: 4/4
+partial: 0
+voices: [{name: soprano
+	  octave: 0
+          content: [2 sol 4 fa mi 2 la sol 4 fa mi re do 2 re - sol
+                    + 2 sol 4 fa mi 2 la sol 4 la sol fa mi 1 re
+                    2 la 4 sol fa 2 sol do 4 fa mi re do 2 do - ti
+                    + 2 do 4 re mi - la ti + do fa 2 mi re 1 do |.]}
+         
+         {name: alto
+	  octave: 0
+          content: [2 do 4 do do 2 do do 4 re do - la la 2 la sol
+                    + 2 do 4 do do 2 do do - 4 la + do do do 1 re
+                    - 4 slur la ti + 4 do re 2 re do 4 re do - ti la 2 sol sol
+                    2 la 4 sol sol sol sol + do do 2. do 4 - ti + 1 do]}
+         
+         {name: tenor
+	  octave: -1
+          content: [2 mi 4 fa sol slur la ti + 2 do - 4 la sol fa mi slur re do - 2 ti
+                    + 2 mi 4 fa sol slur la ti + 2 do - 4 fa sol la la 1 ti
+                    + 2 do 4 do - fa 2 fa mi 4 fa fa sol mi 2 sol 4 slur sol fa 
+                    2 mi 4 sol + do - mi fa sol la 2. sol 4 fa 1 mi]}
+         
+         {name: bass
+	  octave: -1
+          content: [2 do 4 re mi 2 fa mi 4 re mi fa - fa 2 fi sol
+                    + 2 do 4 re mi 2 fa mi 4 re mi fa do 1 sol
+                    2 fa 4 mi re slur do - ti + 2 do - 4 la la ti + do - 2 sol sol
+                    2 la 4 ti + do do re mi fa 2 sol - sol + 1 do]}]

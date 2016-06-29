@@ -7,6 +7,8 @@ import argparse
 from doremi.doremi_parser import DoremiParser
 from doremi.lyric_parser import Lyric, LyricParser
 
+import os, uuid
+
 # set up argument parser and use it
 p = argparse.ArgumentParser()
 p.add_argument("infile",
@@ -70,5 +72,14 @@ ly = tune.to_lilypond(args.key.lower(),
                       lyric=lyric,
                       template=args.template)
 
-outfile = codecs.open(args.outfile, "w", "utf-8")
-outfile.write(ly)
+
+if args.outfile.endswith(".pdf"):
+    fn = "%s.ly" % uuid.uuid4()
+    lyfile = codecs.open("/tmp/%s" % fn, "w", "utf-8")
+    lyfile.write(ly)
+    lyfile.close()
+    args.outfile = args.outfile[:-4]
+    os.system("lilypond -o %s /tmp/%s" % (args.outfile, fn))
+elif args.outfile.endswith(".ly"):
+    with codecs.open(args.outfile, "w", "utf-8") as f:
+        f.write(ly)
