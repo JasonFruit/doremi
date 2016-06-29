@@ -14,7 +14,7 @@
 \score
 {
   <<
-    \new Voice = "exportedvoice_treble" { \clef treble \exportedvoice_treble_music }
+    \new Voice = "exportedvoice_treble" { \clef treble %(partial)s \exportedvoice_treble_music }
     %(treble_lyrics)s
     \new Voice = "exportedvoice_alto" { \clef alto \exportedvoice_alto_music }
     %(alto_lyrics)s
