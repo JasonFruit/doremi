@@ -1,5 +1,6 @@
-tune = (ws (title / composer / key / time / partial / voices) ws)+
+tune = (ws (title / scripture / composer / key / time / partial / voices) ws)+
 title = "title" ws ":" ws string
+scripture = "scripture" ws ":" ws string
 composer = "composer" ws ":" ws string
 key = "key" ws ":" ws name ws name
 time = "time" ws ":" ws fraction

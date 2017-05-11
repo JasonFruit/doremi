@@ -176,11 +176,13 @@ class Tune(list):
     """Represents a vocal-style tune, e.g. a hymn-tune or partsong"""
     def __init__(self,
                  title="",
+                 scripture="",
                  composer="",
                  key="",
                  time=None,
                  partial=None):
         self.title = title
+        self.scripture = scripture
         self.composer = composer
         self.key = key
         self.time = time
@@ -217,6 +219,7 @@ class Tune(list):
                      "lyrictitle": lyric.title,
                      "meter": lyric.meter,
                      "title": self.title,
+                     "scripture": self.scripture,
                      "composer": self.composer,
                      "partial": partial}
 
@@ -273,6 +276,8 @@ class DoremiParser(NodeVisitor):
     # tune level, so they always are added to the tune
     def visit_title(self, node, vc):
         self.tune.title = get_string_val(node)
+    def visit_scripture(self, node, vc):
+        self.tune.scripture = get_string_val(node)
     def visit_composer(self, node, vc):
         self.tune.composer = get_string_val(node)
     def visit_key(self, node, vc):
