@@ -1,9 +1,13 @@
 import strutils, sequtils, parseutils
 
 type
- Token = object
+ Token* = object
    content: string
    start, length: int
+
+proc newToken(start: int = 0): Token =
+  result.content = ""
+  result.start = start
 
 const syllables: seq[string] = @["do", "di", "ra", "re", "ri", "me", 
                                  "mi", "fa", "fi", "se", "sol", "si",
@@ -25,6 +29,8 @@ const white: string = " \n\t\v"
 const brackets: string = "[]{}"
 
 const delimiters: string = white & brackets
+
+const quote: char = '"'
 
 proc isTuneKeyword(s: string): bool =
   return tuneKeywords.contains(s & ":")
@@ -51,11 +57,49 @@ proc syllableDegree(syll: string): int =
     else:
       result = -1
 
-proc tokenize(s: string): seq[string] =
+proc tokenize*(s: string): seq[Token] =
   var tokenStart: Natural = 0
-  result = newSeq[string](0)
+  var cur: Token = newToken()
+  var inString = false
+  result = newSeq[Token](0)
   for pos in 0..high(s):
-    #   result = 
-    # else:
-    #   result.add(
-    echo "Not finished"
+    if inString:
+      cur.content = cur.content & $s[pos]
+
+      if s[pos] == quote and s[pos-1] != '\\':
+        cur.length = pos - cur.start
+        result.add(cur)
+        cur = newToken(pos + 1)
+        inString = false
+
+    elif delimiters.contains(s[pos]):
+      if brackets.contains(s[pos]):
+        if cur.content != "":
+          cur.length = pos - cur.start
+          result.add(cur)
+          cur = newToken(pos)
+        cur.content = $s[pos]
+        cur.length = pos - cur.start
+        result.add(cur)
+        cur = newToken(pos + 1)
+      else:
+        if cur.content == "":
+          cur.start = pos + 1
+        else:
+          cur.length = pos - cur.start
+          result.add(cur)
+          cur = newToken(pos + 1)
+    else:
+      if s[pos] == quote:
+        inString = true
+      cur.content = cur.content & $s[pos]
+
+var code: string
+var file: File
+
+code = readFile("/home/jason/Code/doremi/tunes/old-hundred.drm")
+
+var tokens: seq[Token] = tokenize(code)
+
+for tkn in tokens: 
+  echo tkn.content, ": ", tkn.start
