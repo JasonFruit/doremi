@@ -68,3 +68,6 @@ target/
 
 # temp directory
 tmp/
+
+nim/nimcache
+nim/lex
