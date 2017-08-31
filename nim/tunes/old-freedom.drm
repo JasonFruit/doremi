@@ -1,0 +1,46 @@
+title = "Old Freedom"
+subtitle = "For here have we no continuing city, but we seek one to come. --- Heb.13:14"
+composer = "Jason R. Fruit"
+key = major
+time = 4/4
+partial = 0
+
+voices
+
+name = treble
+octave = 1
+[1 do 2 mi 4 do - la + 2 do 4 do - la slur sol + do do re 2 mi
+2 mi 4 slur la sol mi sol slur la sol mi do 2 re 4 re mi 2 sol
+2 do 2 mi 4 do - la + 2 do 4 do - la slur sol + do do re 2 mi
+2 mi 4 slur la sol mi sol 4 slur mi do - la + do - 2 sol + 4 do do 2 do r
+- 2 ti r + 1 fermata do 2 do fermata - ti fermata + do 4 r
+4 mi slur la sol mi re slur mi fermata do - slur la + do - 2 sol + 4 do do 1 do]
+
+name = alto
+octave = 0
+[1 sol 2 sol 4 sol la 2 sol 4 sol la + 2 do 4 do - ti + 2 do
+- 2 sol  mi 4 mi fa 2 mi 4 sol sol 2 sol 4 sol sol 2 sol
+2 sol 2 sol 4 sol la 2 sol 4 sol la + 2 do 4 do - ti + 2 do
+- 2 sol 2 mi 4 mi fa 2 sol 4 mi fa 2 sol 4 mi mi 2 mi r
+2 r sol 1 fermata sol 2 mi sol fermata sol 4 r
+4 sol slur fa mi sol sol slur sol fermata mi
+4 slur sol la 2 sol 4 mi mi 1 mi]
+         
+name = lead
+octave = 0
+[1 do 2 do 4 mi fa 2 sol 4 + do re 2 mi 4 mi re 2 do
+2 do - 4 slur la ti + do - la slur sol + do do mi 2 re 4 re mi 2 re
+- 2 do 2 do 4 mi fa 2 sol 4 + do re 2 mi 4 mi re 2 do
+2 do - 4 slur la ti + do - la 4 slur sol + do do re 2 mi 4 do do 2 do r
+re r 1 fermata mi 2 mi slur 4 mi fermata re 2 fermata do 4 r
+do 2 do - 4 ti la slur sol + fermata do
+4 slur do re 2 mi 4 do do 1 do |.]
+
+name = bass
+octave = -1
+[1 do 2 do 4 do re 2 mi 4 mi fa 2 sol 4 la sol 2 do
+2 + do do - 4 la + do - 2 sol 4 mi do 2 sol 4 sol re 2 sol
+2 sol do 4 do re 2 mi 4 mi fa 2 sol 4 la sol 2 do
+2 + do do - 4 la + do - 2 sol 4 mi fa 2 sol 4 do do 2 do r
+2 r sol 1 fermata do 2 la fermata sol + fermata do 4 r
+- 4 do  2 la 4 sol fa 2 fermata mi 4 slur mi fa 2 sol 4 do do 1 do]
