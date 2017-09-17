@@ -1,0 +1,4 @@
+{"tune": "default-tune.tmpl",
+ "voice": "default-voice.tmpl",
+ "arbitrary-voices": false,
+ "voice-names": ["soprano", "alto", "tenor", "bass"]}

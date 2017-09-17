@@ -6,7 +6,7 @@ type ParseError* = object of Exception
 
 type
  TimeSignature* = object
-    top, bottom: int
+    top*, bottom*: int
 
 proc `$`(ts: TimeSignature): string =
   return $ts.top & "/" & $ts.bottom
@@ -31,6 +31,7 @@ type
 type
   Voice* = ref object of RootObj
     content*: seq[VoiceObject]
+    clef*: Clefs
     name*, lyrics*: string
     octave*: int
     time*: TimeSignature
@@ -104,7 +105,7 @@ proc parseAssignment(tokens: seq[Token],
                                   value: strip(tokens[start + 2].content, true, true, {'"'}))
     else:
       form = KeywordDefinitionForm(keyword: tokens[start].content,
-                                 value: tokens[start + 2].content)
+                                   value: tokens[start + 2].content)
 
     return ParseResult(form: form, consumedTokens: 3)
 
@@ -137,6 +138,20 @@ proc parseVoice(tokens: seq[Token], start: var int): Voice =
         result.lyrics = pr.form.KeywordDefinitionForm.value
       elif kw == "octave":
         result.octave = pr.form.IntDefinitionForm.value
+      elif kw == "clef":
+        case pr.form.KeywordDefinitionForm.value:
+          of "bass":
+            result.clef = clfBass
+          of "treble":
+            result.clef = clfTreble
+          of "alto":
+            result.clef = clfAlto
+          of "tenor":
+            result.clef = clfTenor
+          of "octave":
+            result.clef = clfOctaveTreble
+          else:
+            raise newException(ParseError, "Invalid clef: '" & pr.form.KeywordDefinitionForm.value & "' at position " & $start & ".")
       elif kw == "time":
         result.time.top = pr.form.TimeSignatureDefinitionForm.top
         result.time.bottom = pr.form.TimeSignatureDefinitionForm.bottom
@@ -153,6 +168,14 @@ proc parseVoice(tokens: seq[Token], start: var int): Voice =
 
         if syllables.contains(tokens[start].content):
           note.syllable = tokens[start].content
+
+          if len(note.syllable) == 1:
+            note.syllable = longSyllable(note.syllable)
+
+          if result.content.len > 0 and
+             result.content[result.content.high].Note.modifiers.contains("slur") and
+             not note.modifiers.contains("slur"):
+            note.modifiers.add("endslur")
           result.content.add(note)
           start += 1
           note = Note(duration: note.duration,
@@ -248,12 +271,14 @@ proc showParsed*(fn: string) =
   echo tune.key
   echo len(tune.voices)
 
-  for note in tune.voices[2].content:
-    if note of Note:
-      write stdout, note.Note.syllable & ", 1/" & $note.Note.duration & ": "
-      for s in note.Note.modifiers:
-        write stdout, s
-        write stdout, " "
-      write stdout, "\n"
-    else:
-      echo note.BarLine.representation
+  for voice in tune.voices:
+    echo voice.name
+    for note in voice.content:
+      if note of Note:
+        write stdout, note.Note.syllable & ", 1/" & $note.Note.duration & ": "
+        for s in note.Note.modifiers:
+          write stdout, s
+          write stdout, " "
+        write stdout, "\n"
+      else:
+        echo note.BarLine.representation
