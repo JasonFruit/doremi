@@ -9,7 +9,7 @@ proc noteheadNode(syllable: string): XmlNode =
   # if not using round noteheads, set up a notehead node
   case noteheadType:
     of nhAikin, nhDefault:
-      return <>notehead(newText(rootSyllable(syllable)))
+      return <>notehead(newText(aikenNotehead(syllable)))
     of nhSacredHarp:
       return <>notehead(newText(sacredHarpNotehead(syllable)))
     of nhRound:
@@ -67,6 +67,14 @@ proc xml*(voice: Voice, key: string, octave, partial: int): XmlNode =
   result = <>part(id=voice.name)
 
   var attribs = <>attributes()
+
+  attribs.add(<>divisions(newText("24")))
+
+  var keyElem = <>key()
+  keyElem.add(<>fifths(newText($keyToFifths(key))))
+
+  attribs.add(keyElem)
+
   var time = <>time()
   time.add(<>beats(newText($voice.time.top)))
 
@@ -77,13 +85,6 @@ proc xml*(voice: Voice, key: string, octave, partial: int): XmlNode =
   attribs.add(time)
 
   attribs.add(clefNode(voice.clef))
-
-  var keyElem = <>key()
-  keyElem.add(<>fifths(newText($keyToFifths(key))))
-
-  attribs.add(keyElem)
-
-  attribs.add(<>divisions(newText("24")))
 
   var measureNum = 1
   var measure = <>measure(number = $measureNum)
@@ -119,14 +120,8 @@ proc xml*(tune: Tune, key: string): XmlNode =
   work.add(title)
   result.add(work)
 
-  var credit = <>credit()
-  var creditType = newElement("credit-type")
-  creditType.add(newText("composer"))
-  credit.add(creditType)
-  var composer = newElement("credit-words")
-  composer.add(newText(tune.composer))
-  credit.add(composer)
-  result.add(credit)
+  var identification = <>identification()
+  identification.add(<>creator(type="composer", newText(tune.composer)))
 
   var parts = newElement("part-list")
   result.add(parts)

@@ -381,18 +381,21 @@ proc syllableDegree*(syll: string): int =
 proc rootSyllable*(syll: string): string =
   return longSyllable($syll[0])
 
+proc aikenNotehead*(syll: string): string =
+  result = rootSyllable(syll)
+  if result == "sol":
+    result = "so"
+
 proc sacredHarpNotehead*(syll: string): string =
   case rootSyllable(syll):
-    of "do":
+    of "do", "fa":
       result = "fa"
-    of "re":
-      result = "sol"
-    of "mi":
+    of "re", "sol":
+      result = "so"
+    of "mi", "la":
       result = "la"
     of "ti":
       result = "mi"
-    else:
-      result = rootSyllable(syll)
 
 proc syllableToPitch*(syllable: string, key: string): FixedPitch =
   return keys[key][syllable]
