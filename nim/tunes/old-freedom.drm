@@ -9,6 +9,7 @@ voices
 
 name = treble
 octave = 1
+clef = treble
 [1 do 2 mi 4 do - la + 2 do 4 do - la slur sol + do do re 2 mi
 2 mi 4 slur la sol mi sol slur la sol mi do 2 re 4 re mi 2 sol
 2 do 2 mi 4 do - la + 2 do 4 do - la slur sol + do do re 2 mi
@@ -18,6 +19,7 @@ octave = 1
 
 name = alto
 octave = 0
+clef = alto
 [1 sol 2 sol 4 sol la 2 sol 4 sol la + 2 do 4 do - ti + 2 do
 - 2 sol  mi 4 mi fa 2 mi 4 sol sol 2 sol 4 sol sol 2 sol
 2 sol 2 sol 4 sol la 2 sol 4 sol la + 2 do 4 do - ti + 2 do
@@ -28,6 +30,7 @@ octave = 0
          
 name = lead
 octave = 0
+clef = octave
 [1 do 2 do 4 mi fa 2 sol 4 + do re 2 mi 4 mi re 2 do
 2 do - 4 slur la ti + do - la slur sol + do do mi 2 re 4 re mi 2 re
 - 2 do 2 do 4 mi fa 2 sol 4 + do re 2 mi 4 mi re 2 do
@@ -38,6 +41,7 @@ do 2 do - 4 ti la slur sol + fermata do
 
 name = bass
 octave = -1
+clef = bass
 [1 do 2 do 4 do re 2 mi 4 mi fa 2 sol 4 la sol 2 do
 2 + do do - 4 la + do - 2 sol 4 mi do 2 sol 4 sol re 2 sol
 2 sol do 4 do re 2 mi 4 mi fa 2 sol 4 la sol 2 do

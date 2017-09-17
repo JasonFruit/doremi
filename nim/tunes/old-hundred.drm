@@ -8,30 +8,30 @@ name = soprano
 octave = 1
 clef = treble
 [2 do do - ti la sol + do re fermata mi
-mi mi mi re do fa mi fermata re
-do re mi re do - la ti + fermata do
-sol mi do re fa mi re fermata do |.]
+ mi mi mi re do fa mi fermata re
+ do re mi re do - la ti + fermata do
+ sol mi do re fa mi re fermata do |.]
          
 name = alto
 octave = 0
 clef = treble
 [2 sol sol sol mi mi mi sol sol
-sol sol + do - ti + do do do - ti
-+ do - ti + do - sol sol la sol sol
-+ do - sol la ti 4 slur la ti + 2 do - ti + do]
+ sol sol + do - ti + do do do - ti
+ + do - ti + do - sol sol la sol sol
+ + do - sol la ti 4 slur la ti + 2 do - ti + do]
          
 name = tenor
 octave = 0
 clef = octave
 [2 mi mi re do - ti la ti + do
-do mi sol sol mi la sol sol
-mi sol sol fa sol 4 slur fa mi 2 re mi
-mi do mi sol la sol fa mi]
+ do mi sol sol mi la sol sol
+ mi sol sol fa sol 4 slur fa mi 2 re mi
+ mi do mi sol la sol fa mi]
          
 name = bass
 octave = 0
 clef = bass
 [2 do do - sol la mi la sol do
-+ do do do - sol la fa do sol
-la sol + do - sol mi fa sol do
-+ do do - la sol re 4 slur mi fa 2 sol do]
+ + do do do - sol la fa do sol
+ la sol + do - sol mi fa sol do
+ + do do - la sol re 4 slur mi fa 2 sol do]

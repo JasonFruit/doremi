@@ -418,32 +418,7 @@ proc keyOctaveOffset*(key, syllable: string): int =
       return 1
 
 proc keyToFifths*(key: string): int =
-  case key.toLower():
-    of "a":
-      result = 3
-    of "aes":
-      result = -4
-    of "b":
-      result = 5
-    of "bes":
-      result = -2
-    of "c":
-      result = 0
-    of "d":
-      result = 2
-    of "des":
-      result = -5
-    of "e":
-      result = 4
-    of "es":
-      result = -3
-    of "f":
-      result = -1
-    of "fis":
-      result = 6
-    of "g":
-      result = 1
-    of "ges":
-      result = -6
-    else:
-      raise newException(InvalidKeyError, "Invalid key: '" & key & "'.")
+  var keys = @["ges", "des", "aes", "es", "bes", "f", 
+               "c", "g", "d", "a", "e", "b", "fis"]
+
+  return keys.find(key.toLower()) - keys.find("c")
