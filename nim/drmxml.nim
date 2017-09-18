@@ -19,8 +19,11 @@ proc noteheadNode(syllable: string): XmlNode =
       return newComment("No notehead type needed.")
 
 var lastNoteSlurred = false
+var lastNoteTied = false
 
 proc xml*(note: Note, key: string, octave: int): XmlNode =
+  var addNotations = false
+
   result = <>note()
 
   if note.syllable == "r":
@@ -43,29 +46,56 @@ proc xml*(note: Note, key: string, octave: int): XmlNode =
     result.add(pitch)
 
   result.add(<>duration(newText($(96 / note.duration).int)))
-  
+
+  # add a tie to the note, but don't alter lastNoteTied yet; we also
+  # have to add the tie to <notations>(!)
+  if note.modifiers.contains("tie"):
+    if lastNoteTied:
+      result.add(<>tie(type="stop"))
+    result.add(<>tie(type="start"))
+  elif lastNoteTied:
+    result.add(<>tie(type="stop"))
+
   result.add(<>type(newText(durationToNoteType(note.duration))))
 
   # if not using round noteheads, set up a notehead node
   if noteheadType != nhRound:
     result.add(noteheadNode(note.syllable))
 
+  var notations: XmlNode = <>notations()
+
   if note.modifiers.contains("slur") and not lastNoteSlurred:
-    var notations: XmlNode = <>notations()
     var slur: XmlNode
     slur = <>slur(type="start")
     notations.add(slur)
-    result.add(notations)
+    addNotations = true
     lastNoteSlurred = true
-
   elif lastNoteSlurred:
-    var notations: XmlNode = <>notations()
     var slur: XmlNode
     slur = <>slur(type="stop")
     notations.add(slur)
-    result.add(notations)
+    addNotations = true
     lastNoteSlurred = false
 
+  if note.modifiers.contains("fermata"):
+    notations.add(<>fermata())
+    addNotations = true
+
+  # duplicate the logic for adding the tie to the note, except this
+  # time change lastNoteTied to its new value
+  if note.modifiers.contains("tie"):
+    if lastNoteTied:
+      notations.add(<>tied(type="stop"))
+    lastNoteTied = true
+    notations.add(<>tied(type="start"))
+    addNotations = true
+  elif lastNoteTied:
+    lastNoteTied = false
+    notations.add(<>tied(type="stop"))
+    addNotations = true
+
+  if addNotations:
+    result.add(notations)
 
 proc clefNode(clef: Clefs): XmlNode =
   result = <>clef()

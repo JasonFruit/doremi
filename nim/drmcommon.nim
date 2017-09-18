@@ -402,15 +402,30 @@ proc syllableToPitch*(syllable: string, key: string): FixedPitch =
 
 proc durationToNoteType*(duration: int): string = 
   case duration:
+    of -2:
+      result = "maxima"
+    of -1:
+      result = "long"
+    of 0:
+      result = "breve"
     of 1:
       result = "whole"
     of 2:
       result = "half"
     of 4:
       result = "quarter"
-    else:
-      # TODO: obviously this isn't right
+    of 8:
       result = "eighth"
+    of 16:
+      result = "16th"
+    of 32:
+      result = "32nd"
+    of 64:
+      result = "64th"
+    of 128:
+      result = "128th"
+    else:
+      result = "mu"
 
 proc keyOctaveOffset*(key, syllable: string): int =
   var pastC: string
