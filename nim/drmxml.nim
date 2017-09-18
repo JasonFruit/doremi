@@ -5,6 +5,9 @@ var noteheadType*: Noteheads = nhDefault
 proc setNoteheads*(typ: Noteheads) =
   noteheadType = typ
 
+const musicXmlDoctype*: string = """<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 3.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">"""
+
+
 proc noteheadNode(syllable: string): XmlNode =
   # if not using round noteheads, set up a notehead node
   case noteheadType:
@@ -15,23 +18,30 @@ proc noteheadNode(syllable: string): XmlNode =
     of nhRound:
       return newComment("No notehead type needed.")
 
+var lastNoteSlurred = false
+
 proc xml*(note: Note, key: string, octave: int): XmlNode =
-  var fp: FixedPitch = syllableToPitch(note.syllable, key)
-
-  var pitch = <>pitch()
-
-  pitch.add(<>step(newText(fp.name)))
-
-  if fp.alteration != 0:
-    pitch.add(<>alter(newText($fp.alteration)))
-
-  var actualOctave: int = octave + keyOctaveOffset(key, note.syllable)
-  
-  pitch.add(<>octave(newText($actualOctave)))
-
   result = <>note()
 
-  result.add(pitch)
+  if note.syllable == "r":
+    var rest = <>rest()
+    result.add(rest)
+  
+  else:
+    var fp: FixedPitch = syllableToPitch(note.syllable, key)
+    var pitch = <>pitch()
+
+    pitch.add(<>step(newText(fp.name)))
+
+    if fp.alteration != 0:
+      pitch.add(<>alter(newText($fp.alteration)))
+
+    var actualOctave: int = octave + keyOctaveOffset(key, note.syllable)
+
+    pitch.add(<>octave(newText($actualOctave)))
+
+    result.add(pitch)
+
   result.add(<>duration(newText($(96 / note.duration).int)))
   
   result.add(<>type(newText(durationToNoteType(note.duration))))
@@ -39,6 +49,23 @@ proc xml*(note: Note, key: string, octave: int): XmlNode =
   # if not using round noteheads, set up a notehead node
   if noteheadType != nhRound:
     result.add(noteheadNode(note.syllable))
+
+  if note.modifiers.contains("slur") and not lastNoteSlurred:
+    var notations: XmlNode = <>notations()
+    var slur: XmlNode
+    slur = <>slur(type="start")
+    notations.add(slur)
+    result.add(notations)
+    lastNoteSlurred = true
+
+  elif lastNoteSlurred:
+    var notations: XmlNode = <>notations()
+    var slur: XmlNode
+    slur = <>slur(type="stop")
+    notations.add(slur)
+    result.add(notations)
+    lastNoteSlurred = false
+
 
 proc clefNode(clef: Clefs): XmlNode =
   result = <>clef()
@@ -138,3 +165,4 @@ proc xml*(tune: Tune, key: string): XmlNode =
     part.add(name)
 
     result.add(voice.xml(key, voice.octave + 3, tune.partial))
+

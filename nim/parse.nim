@@ -169,9 +169,6 @@ proc parseVoice(tokens: seq[Token], start: var int): Voice =
         if syllables.contains(tokens[start].content):
           note.syllable = tokens[start].content
 
-          if len(note.syllable) == 1:
-            note.syllable = longSyllable(note.syllable)
-
           if result.content.len > 0 and
              result.content[result.content.high].Note.modifiers.contains("slur") and
              not note.modifiers.contains("slur"):
