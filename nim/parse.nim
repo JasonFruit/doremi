@@ -170,6 +170,7 @@ proc parseVoice(tokens: seq[Token], start: var int): Voice =
           note.syllable = tokens[start].content
 
           if result.content.len > 0 and
+             result.content[result.content.high] of Note and 
              result.content[result.content.high].Note.modifiers.contains("slur") and
              not note.modifiers.contains("slur"):
             note.modifiers.add("endslur")

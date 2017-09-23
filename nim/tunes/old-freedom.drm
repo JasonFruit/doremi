@@ -31,12 +31,12 @@ clef = alto
 name = lead
 octave = 0
 clef = octave
-[1 do 2 do 4 mi fa 2 sol 4 + do re 2 mi 4 mi re 2 do
-2 do - 4 slur la ti + do - la slur sol + do do mi 2 re 4 re mi 2 re
-- 2 do 2 do 4 mi fa 2 sol 4 + do re 2 mi 4 mi re 2 do
-2 do - 4 slur la ti + do - la 4 slur sol + do do re 2 mi 4 do do 2 do r
-re r 1 fermata mi 2 mi slur 4 mi fermata re 2 fermata do 4 r
-do 2 do - 4 ti la slur sol + fermata do
+[1 do 2 do 4 mi fa 2 sol 4 + do re 2 mi 4 mi re 2 do ||
+2 do - 4 slur la ti + do - la slur sol + do do mi 2 re 4 re mi 2 re ||
+- 2 do 2 do 4 mi fa 2 sol 4 + do re 2 mi 4 mi re 2 do ||
+2 do - 4 slur la ti + do - la 4 slur sol + do do re 2 mi 4 do do 2 do r ||
+re r 1 fermata mi 2 mi slur 4 mi fermata re 2 fermata do 4 r ||
+do 2 do - 4 ti la slur sol + fermata do ||
 4 slur do re 2 mi 4 do do 1 do |.]
 
 name = bass

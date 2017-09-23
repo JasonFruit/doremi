@@ -440,3 +440,4 @@ proc keyToFifths*(key: string): int =
                "c", "g", "d", "a", "e", "b", "fis"]
 
   return keys.find(key.toLower()) - keys.find("c")
+

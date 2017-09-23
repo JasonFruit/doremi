@@ -8,41 +8,52 @@ proc setNoteheads*(typ: Noteheads) =
 const musicXmlDoctype*: string = """<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 3.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">"""
 
 
+# returns a node specifying the appropriate notehead for the syllable
 proc noteheadNode(syllable: string): XmlNode =
-  # if not using round noteheads, set up a notehead node
   case noteheadType:
     of nhAikin, nhDefault:
       return <>notehead(newText(aikenNotehead(syllable)))
     of nhSacredHarp:
       return <>notehead(newText(sacredHarpNotehead(syllable)))
     of nhRound:
+      # other program logic should prevent getting here
       return newComment("No notehead type needed.")
 
+# track if the previous note was slurred/tied or not, so you know
+# whether to end a slur/tie on the current note
 var lastNoteSlurred = false
 var lastNoteTied = false
 
+# represent a note as MusicXML in a given key and octave
 proc xml*(note: Note, key: string, octave: int): XmlNode =
   var addNotations = false
 
   result = <>note()
 
+  # if the note is a rest, skip all the pitch and octave stuff
   if note.syllable == "r":
     var rest = <>rest()
     result.add(rest)
   
-  else:
+  else: # if it's a pitched note
+
     var fp: FixedPitch = syllableToPitch(note.syllable, key)
     var pitch = <>pitch()
 
+    # add a node for the base note name
     pitch.add(<>step(newText(fp.name)))
 
+    # add the alteration -2..2 = doubleflat..doublesharp
     if fp.alteration != 0:
       pitch.add(<>alter(newText($fp.alteration)))
 
+    # since doremi reads octaves from do, and musicxml always starts
+    # them from c, some notes are offset an octave: correct for it
     var actualOctave: int = octave + keyOctaveOffset(key, note.syllable)
 
     pitch.add(<>octave(newText($actualOctave)))
 
+    # the pitch node is now ready
     result.add(pitch)
 
   result.add(<>duration(newText($(96 / note.duration).int)))
@@ -120,6 +131,26 @@ proc clefNode(clef: Clefs): XmlNode =
       oct.add(newText("-1"))
       result.add(oct)
 
+proc barlineNode(barline: Barline, location: string): XmlNode =
+  result = <>barline(location=location)
+  var barlineStyle = newElement("bar-style")
+  
+  case barline.representation:
+    of "||":
+      barlineStyle.add(newText("light-light"))
+    of "|.":
+      barlineStyle.add(newText("light-heavy"))
+    of ":|":
+      barlineStyle.add(newText("light-heavy"))
+      barlineStyle.add(<>repeat(direction="forward"))
+    of "|:":
+      barlineStyle.add(newText("heavy-light"))
+      barlineStyle.add(<>repeat(direction="backward"))
+    else:
+      raise newException(ParseError, "Invalid barline type: '" & barline.representation)
+
+  result.add(barlineStyle)
+
 proc xml*(voice: Voice, key: string, octave, partial: int): XmlNode =
   result = <>part(id=voice.name)
 
@@ -158,8 +189,20 @@ proc xml*(voice: Voice, key: string, octave, partial: int): XmlNode =
         curOctave += 1
       measure.add(obj.Note.xml(key, curOctave))
       measureLen = measureLen + (1.0 / obj.Note.duration.float64)
+    elif obj of Barline:
+      var m: XmlNode
+      var bn: XmlNode
+      if measureLen == 0.0:
+        var res = result.findAll("measure")
+        m = res[res.high]
+        bn = barlineNode(obj.Barline, "right")
+      else:
+        m = measure
+        bn = barlineNode(obj.Barline, "middle")
+      m.add(bn)
     if measureLen >= 0.97:
       measureLen = 0.0
+
       result.add(measure)
       measureNum += 1
       measure = <>measure(number = $measureNum)
@@ -172,6 +215,9 @@ proc xml*(tune: Tune, key: string): XmlNode =
   result.attrs = newStringTable("version", "3.0", modeCaseSensitive)
 
   var work = <>work()
+  var subtitle = newElement("work-number")
+  subtitle.add(newText(tune.subtitle))
+  work.add(subtitle)
   var title = newElement("work-title")
   title.add(newText(tune.title))
   work.add(title)
@@ -179,6 +225,8 @@ proc xml*(tune: Tune, key: string): XmlNode =
 
   var identification = <>identification()
   identification.add(<>creator(type="composer", newText(tune.composer)))
+
+  result.add(identification)
 
   var parts = newElement("part-list")
   result.add(parts)
