@@ -1,6 +1,7 @@
 import drmcommon, lex, strutils
 
 type Keys = enum kMajor, kMinor
+type Triplets* = enum tptNone, tptStart, tptStop
 
 type ParseError* = object of Exception
 
@@ -18,6 +19,7 @@ type
   Note* = ref object of VoiceObject
     syllable*: string
     duration*: int
+    triplet*: Triplets
     modifiers*: seq[string]
 
 type
@@ -122,6 +124,7 @@ proc parseVoice(tokens: seq[Token], start: var int): Voice =
                  time: TimeSignature(top: 4, bottom: 4))
 
   var note = Note(duration: 4,
+                  triplet: tptNone,
                   modifiers: newSeq[string](0))
 
   while start <= tokens.high:
@@ -161,7 +164,6 @@ proc parseVoice(tokens: seq[Token], start: var int): Voice =
       start += pr.consumedTokens
 
     elif tokens[start].content == "[":
-
       start += 1
 
       while tokens[start].content != "]":
@@ -177,8 +179,15 @@ proc parseVoice(tokens: seq[Token], start: var int): Voice =
           result.content.add(note)
           start += 1
           note = Note(duration: note.duration,
+                      triplet: tptNone,
                       modifiers: newSeq[string](0))
 
+        elif tripletBrackets.contains(tokens[start].content):
+          if tokens[start].content == "(":
+            note.triplet = tptStart
+          else:
+            note.triplet = tptStop
+          start += 1
         elif octaveChanges.contains(tokens[start].content):
           note.modifiers.add(tokens[start].content)
           start += 1

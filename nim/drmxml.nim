@@ -23,6 +23,7 @@ proc noteheadNode(syllable: string): XmlNode =
 # whether to end a slur/tie on the current note
 var lastNoteSlurred = false
 var lastNoteTied = false
+var inTriplet = false
 
 # represent a note as MusicXML in a given key and octave
 proc xml*(note: Note, key: string, octave: int): XmlNode =
@@ -56,7 +57,18 @@ proc xml*(note: Note, key: string, octave: int): XmlNode =
     # the pitch node is now ready
     result.add(pitch)
 
-  result.add(<>duration(newText($(96 / note.duration).int)))
+  var dur = (96 / note.duration).int
+
+  # handle triplets
+  if note.triplet == tptStart:
+    inTriplet = true
+  elif note.triplet == tptStop:
+    inTriplet = false
+    
+  if inTriplet:
+    dur = (2 * dur / 3).int
+
+  result.add(<>duration(newText($dur)))
 
   # add a tie to the note, but don't alter lastNoteTied yet; we also
   # have to add the tie to <notations>(!)
@@ -68,6 +80,16 @@ proc xml*(note: Note, key: string, octave: int): XmlNode =
     result.add(<>tie(type="stop"))
 
   result.add(<>type(newText(durationToNoteType(note.duration))))
+
+  if inTriplet:
+    var tpt = newElement("time-modification")
+    var actual = newElement("actual-notes")
+    actual.add(newText("3"))
+    var normal = newElement("normal-notes")
+    normal.add(newText("2"))
+    tpt.add(actual)
+    tpt.add(normal)
+    result.add(tpt)
 
   # if not using round noteheads, set up a notehead node
   if noteheadType != nhRound:
@@ -188,7 +210,11 @@ proc xml*(voice: Voice, key: string, octave, partial: int): XmlNode =
       elif obj.Note.modifiers.contains("+"):
         curOctave += 1
       measure.add(obj.Note.xml(key, curOctave))
-      measureLen = measureLen + (1.0 / obj.Note.duration.float64)
+      if obj.Note.triplet == tptStart or (inTriplet and not (obj.Note.triplet == tptStop)):
+        measureLen = measureLen + (0.67 / obj.Note.duration.float64)
+      else:
+        measureLen = measureLen + (1.0 / obj.Note.duration.float64)
+        
     elif obj of Barline:
       var m: XmlNode
       var bn: XmlNode

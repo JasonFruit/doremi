@@ -342,14 +342,15 @@ const tonics*: seq[string] = @["c", "ces", "cis", "d", "des", "dis",
                               "b", "bes", "bis"]
 
 const white*: string = " \n\t\v"
-const brackets*: string = "[]{}"
+const brackets*: string = "[]"
+const tripletBrackets*: string = "()"
 const assigners*: string = "="
 const octaveChanges*: string = "+-"
 const otherModifiers*: seq[string] = @["slur", "tie", "fermata"]
 const barlines*: seq[string] = @["||", "|.", ":|", "|:"]
 const durations*: seq[string] = @["1", "2", "4", "8", "16", "32"]
 
-const delimiters*: string = white & brackets & assigners
+const delimiters*: string = white & brackets & assigners & tripletBrackets
 
 const quote*: char = '"'
 
@@ -420,15 +421,10 @@ proc durationToNoteType*(duration: int): string =
       result = "16th"
     of 32:
       result = "32nd"
-    of 64:
-      result = "64th"
-    of 128:
-      result = "128th"
     else:
       result = "mu"
 
 proc keyOctaveOffset*(key, syllable: string): int =
-  var pastC: string
   for note in "cdefgab":
     if note == key.toLower()[0]:
       return 0

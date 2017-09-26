@@ -15,7 +15,7 @@ proc tokenize*(s: string): seq[Token] =
         inString = false
 
     elif delimiters.contains(s[pos]):
-      if assigners.contains(s[pos]) or brackets.contains(s[pos]):
+      if assigners.contains(s[pos]) or brackets.contains(s[pos]) or tripletBrackets.contains(s[pos]):
         if cur.content != "":
           cur.length = pos - cur.start
           result.add(cur)
