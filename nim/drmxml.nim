@@ -23,6 +23,8 @@ proc noteheadNode(syllable: string): XmlNode =
 # whether to end a slur/tie on the current note
 var lastNoteSlurred = false
 var lastNoteTied = false
+
+# internal notes of a triplet are not marked, so keep track
 var inTriplet = false
 
 # represent a note as MusicXML in a given key and octave
@@ -57,6 +59,7 @@ proc xml*(note: Note, key: string, octave: int): XmlNode =
     # the pitch node is now ready
     result.add(pitch)
 
+  # the duration if not a triplet (whole-notes are 96 units in length)
   var dur = (96 / note.duration).int
 
   # handle triplets
